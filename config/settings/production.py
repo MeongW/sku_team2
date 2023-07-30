@@ -4,6 +4,7 @@ from .base import *
 DEBUG = False
 
 ALLOWED_HOSTS = [
+    'localhost',
     '3.36.100.188',
 ] # Domain N*ame or IP Address
 
