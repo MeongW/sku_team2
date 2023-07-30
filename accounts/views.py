@@ -6,17 +6,33 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.views import APIView
 
-from .serializers import CustomUserSignUpSerializer, CustomUserLoginSerializer, TokenObtainPairSerializer
+from dj_rest_auth.registration.views import RegisterView
+
+
+'''
+@permission_classes([AllowAny])
+class SignUpView(generics.CreateAPIView):
+    serializer_class = CustomUserSignUpSerializer
+    
+    def create(self, request):
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        pa
 
 @permission_classes([AllowAny])
 class LoginView(APIView):
     serializer_class = CustomUserLoginSerializer
     
     def post(self, request):
+        email = request.POST['email']
+        password = request.POST['password']
         user = authenticate(
-            email = request.POST['email'],
-            password = request.POST['password'],
+            request,
+            email=email,
+            password=password,
         )
+        
         if user is not None:
             serializer = CustomUserLoginSerializer(user)
             token = TokenObtainPairSerializer.get_token(user)
@@ -35,17 +51,5 @@ class LoginView(APIView):
             return res
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-@permission_classes([AllowAny])
-class SignUpView(generics.CreateAPIView):
-    serializer_class = CustomUserSignUpSerializer
-    
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-        )
+            
+'''

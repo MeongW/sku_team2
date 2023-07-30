@@ -55,10 +55,19 @@ PROJECT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    # Rest API
     'rest_framework',
+    
+    
+    # User Login, Registration
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    #'rest_framework_simplejwt.token_blacklist',
-    #'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    
+    # swagger
     'drf_yasg',
 ]
 
@@ -137,11 +146,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+
+# JWT setting
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 }
 
@@ -155,3 +169,21 @@ SIMPLE_JWT = {
     
     'TOKEN_USER_CLASS': 'accounts.CustomUser',
 }
+
+
+# dj_rest_auth setting
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'sku_team2-auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'sku_team2-refresh-token'
+}
+ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
+
+SITE_ID = 1
+REST_USE_JWT = True
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'

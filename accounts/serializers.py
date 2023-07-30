@@ -1,26 +1,17 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer as JwtTokenObtainPairSerializer
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
-class CustomUserLoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            'email',
-            'password',
-        ]
-
-class CustomUserSignUpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            'email',
-            'password',
-            'name',
-            'age',
-        ]
-
-class TokenObtainPairSerializer(JwtTokenObtainPairSerializer):
-    username_field = get_user_model().USERNAME_FIELD
+class CustomRegisterSerializer(RegisterSerializer):
+    profile_image = serializers.ImageField()
+    nickname = serializers.CharField()
+    introduce = serializers.CharField()
+    
+    def get_cleaned_data(self):
+        data = super().get_cleaned_data()
+        
+        data['profile_image'] = self.validated_data.get('profile_image', '')
+        data['nickname'] = self.validated_data.get('nickname', '')
+        data['introduce'] = self.validated_data.get('introduce', '')
+        
+        return data

@@ -4,24 +4,24 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, name, age, password=None):
-        if not email:
-            raise ValueError('Users must have an email address')
+    def create_user(self, username, nickname, introduce, password=None):
+        if not username:
+            raise ValueError('Users must have an username')
         user = self.model(
-            email = self.normalize_email(email),
-            name = name,
-            age = age,
+            username = username,
+            nickname = nickname,
+            introduce = introduce,
         )
         user.set_password(password)
         user.save(using = self.db)
         
         return user
     
-    def create_superuser(self, email, name, age, password=None):
+    def create_superuser(self, username, nickname, introduce, password=None):
         user = self.create_user(
-            email=email,
-            name=name,
-            age=age,
+            username=username,
+            nickname=nickname,
+            introduce=introduce,
             password=password,
         )
         user.is_staff = True
@@ -32,9 +32,10 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True, max_length=128)
-    name = models.CharField(max_length=32)
-    age = models.IntegerField()
+    username = models.CharField(unique=True, max_length=50)
+    nickname = models.CharField(max_length=32)
+    introduce = models.CharField(max_length=50)
+    profile_image = models.ImageField(upload_to='images/')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -42,8 +43,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'age']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['nickname', 'introduce']
 
     def __str__(self):
-        return self.email
+        return self.username

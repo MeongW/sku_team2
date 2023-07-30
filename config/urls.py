@@ -11,14 +11,8 @@ from rest_framework_simplejwt.views import (
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from posts.views import (
-    PostListCreateView, 
-    PostRetrieveUpdateView, 
-    PostModelViewSet,
-)
-from accounts.views import SignUpView, LoginView
 
-#from . import views
+from posts.views import PostModelViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -48,6 +42,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
-    path('signup/', SignUpView.as_view(), name='signup'),
-    path('login/', LoginView.as_view(), name='login'),
+    
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls'))
 ]
