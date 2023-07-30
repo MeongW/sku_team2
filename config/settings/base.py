@@ -177,8 +177,7 @@ SIMPLE_JWT = {
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'sku_team2-auth',
-    'JWT_AUTH_REFRESH_COOKIE': 'sku_team2-refresh-token'
+    'JWT_AUTH_HTTPONLY': False,
 }
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 
