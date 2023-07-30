@@ -155,12 +155,3 @@ SIMPLE_JWT = {
     
     'TOKEN_USER_CLASS': 'accounts.CustomUser',
 }
-
-
-# Security settings
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = False
-
-CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['http://3.36.100.188/']
