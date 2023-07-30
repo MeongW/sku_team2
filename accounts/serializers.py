@@ -3,7 +3,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
 class CustomRegisterSerializer(RegisterSerializer):
-    profile_image = serializers.ImageField()
+    profile_image = serializers.ImageField(use_url=True, required=False)
     nickname = serializers.CharField()
     introduce = serializers.CharField()
     

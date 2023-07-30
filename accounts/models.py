@@ -3,6 +3,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
+def user_directory_path(instance, filename):
+    return 'user_{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, nickname, introduce, password=None):
         if not username:
@@ -35,7 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=50)
     nickname = models.CharField(max_length=32)
     introduce = models.CharField(max_length=50)
-    profile_image = models.ImageField(upload_to='images/')
+    profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
