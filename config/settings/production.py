@@ -3,7 +3,9 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [] # Domain N*ame or IP Address
+ALLOWED_HOSTS = [
+    '3.36.100.188',
+] # Domain N*ame or IP Address
 
 
 # Application definition
