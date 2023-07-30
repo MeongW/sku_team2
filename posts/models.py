@@ -21,4 +21,5 @@ class Comment(models.Model):
 
 class PostLike(models.Model):
     post = models.ForeignKey(to='Post', on_delete=models.CASCADE)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=False, blank=False) 
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=False, blank=False)
+    like_at = models.DateTimeField(verbose_name='생성일', auto_now_add=True)

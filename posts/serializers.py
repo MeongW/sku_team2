@@ -15,7 +15,6 @@ class PostListModelSerializer(PostBaseModelSerializer):
             'image',
             'content',
             'created_at',
-            'like_count',
             'view_count',
             'writer',
         ]
