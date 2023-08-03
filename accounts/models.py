@@ -4,26 +4,28 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 def user_directory_path(instance, filename):
-    return 'user_{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
+    return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, nickname, introduce, password=None):
+    def create_user(self, username, nickname, email, introduce, password=None):
         if not username:
             raise ValueError('Users must have an username')
         user = self.model(
-            username = username,
-            nickname = nickname,
-            introduce = introduce,
+            username=username,
+            nickname=nickname,
+            email=email,
+            introduce=introduce,
         )
         user.set_password(password)
         user.save(using = self.db)
         
         return user
     
-    def create_superuser(self, username, nickname, introduce, password=None):
+    def create_superuser(self, username, nickname, email, introduce, password=None):
         user = self.create_user(
             username=username,
             nickname=nickname,
+            email=email,
             introduce=introduce,
             password=password,
         )
@@ -37,6 +39,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=50)
     nickname = models.CharField(max_length=32)
+    email = models.EmailField()
     introduce = models.CharField(max_length=50)
     profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -47,7 +50,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['nickname', 'introduce']
+    REQUIRED_FIELDS = ['nickname', 'email', 'introduce']
 
     def __str__(self):
         return self.username

@@ -1,55 +1,24 @@
-from django.contrib.auth import authenticate
+from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter, KakaoProvider
+from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 
-from rest_framework import generics, status
-from rest_framework.decorators import permission_classes
+from django.conf import settings
+
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.account.utils import user_username
+
+
+from dj_rest_auth.registration.views import SocialLoginView
+
+
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
-from dj_rest_auth.registration.views import RegisterView
-
-
-'''
-@permission_classes([AllowAny])
-class SignUpView(generics.CreateAPIView):
-    serializer_class = CustomUserSignUpSerializer
-    
-    def create(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
-        
-        pa
-
-@permission_classes([AllowAny])
-class LoginView(APIView):
-    serializer_class = CustomUserLoginSerializer
-    
-    def post(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
-        user = authenticate(
-            request,
-            email=email,
-            password=password,
-        )
-        
-        if user is not None:
-            serializer = CustomUserLoginSerializer(user)
-            token = TokenObtainPairSerializer.get_token(user)
-            refresh_token = str(token)
-            access_token = str(token.access_token)
-            res = Response(
-                {
-                    "user": serializer.data,
-                    "token": {
-                        "access": access_token,
-                        "refresh": refresh_token,
-                    },
-                },
-                status=status.HTTP_200_OK,
-            )
-            return res
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-            
-'''
+class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+    def get_signup_form_initial_data(self, sociallogin):
+        user = sociallogin.user
+        initial = {
+            "username": user_username(user) or "",
+        }
+        return initial

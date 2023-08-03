@@ -66,6 +66,9 @@ THIRD_PARTY_APPS = [
     'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
     
     # swagger
     'drf_yasg',
@@ -176,6 +179,7 @@ SIMPLE_JWT = {
 # dj_rest_auth setting
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
 }
@@ -188,3 +192,13 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS=False
+ACCOUNT_LOGOUT_ON_GET = True
+LOGIN_REDIRECT_URL = '/'
