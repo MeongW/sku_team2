@@ -31,6 +31,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         read_only_fields = ('email',)
 
 class CustomRegisterSerializer(RegisterSerializer):
+    email = serializers.EmailField()
     profile_image = serializers.ImageField(use_url=True, required=False)
     nickname = serializers.CharField()
     introduce = serializers.CharField()
@@ -38,6 +39,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     def get_cleaned_data(self):
         data = super().get_cleaned_data()
         
+        data['email'] = self.validated_data.get('email', '')
         data['profile_image'] = self.validated_data.get('profile_image', '')
         data['nickname'] = self.validated_data.get('nickname', '')
         data['introduce'] = self.validated_data.get('introduce', '')
