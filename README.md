@@ -15,8 +15,14 @@ Add File secrets.json
 
 
 ### 익스텐션 추가 (해당 프로젝트 기준 3환경 모두 같은 내용)
+
+- 로컬 환경
 pip install -r .\requirements\local.txt
+
+- 개발 환경
 pip install -r .\requirements\development.txt
+
+- 운영 환경
 pip install -r .\requirements\production.txt
 
 
@@ -26,11 +32,11 @@ python manage.py makemigrations
 python manage.py migrate
 
 ### 서버 실행
-1. 로컬 환경
+- 로컬 환경
 python manage.py runserver --settings=config.settings.local
 
-2. 개발 환경
+- 개발 환경
 python manage.py runserver --settings=config.settings.development
 
-3. 운영 환경
+- 운영 환경
 python manage.py runserver --settings=config.settings.production
