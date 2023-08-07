@@ -39,7 +39,6 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'introduce'):
             extra_fields.append('introduce')
         
-        
         model = UserModel
         fields = ('pk', *extra_fields)
         read_only_fields = ('email',)
