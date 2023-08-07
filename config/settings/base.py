@@ -38,6 +38,11 @@ def get_secret(setting, secrets_dict=secrets):
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
+# SMS_NAVER_SECRET
+SMS_NAVER_ACCESS_KEY_ID = get_secret('SMS_NAVER_ACCESS_KEY_ID')
+SMS_NAVER_SECRET_KEY = get_secret('SMS_NAVER_SECRET_KEY')
+SMS_NAVER_SERVICE_ID = get_secret('SMS_NAVER_SERVICE_ID')
+SEND_PHONE_NUMBER = get_secret('SEND_PHONE_NUMBER')
 
 # Application definition
 DJANGO_APPS = [
