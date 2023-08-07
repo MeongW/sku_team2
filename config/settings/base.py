@@ -184,7 +184,9 @@ SIMPLE_JWT = {
 # dj_rest_auth setting
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    'REGISTER_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny', 'accounts.permissions.IsSMSAuthenticated'), 
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
 }

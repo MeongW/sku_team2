@@ -7,10 +7,17 @@ from django.core.validators import RegexValidator
 
 from rest_framework import serializers
 
-from dj_rest_auth.serializers import UserDetailsSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer, PasswordChangeSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
 UserModel = get_user_model()
+
+class CustomPasswordResetSerializer(PasswordChangeSerializer):
+    auth_answer = serializers.CharField(max_length=100)
+    phone_number = serializers.CharField(max_length=11, validators=[
+        RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
+    ])
+    username = serializers.CharField()
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):
     class Meta:
@@ -25,6 +32,8 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
             extra_fields.append('last_name')
         if hasattr(UserModel, 'profile_image'):
             extra_fields.append('profile_image')
+        if hasattr(UserModel, 'phone_number'):
+            extra_fields.append('phone_number')
         if hasattr(UserModel, 'nickname'):
             extra_fields.append('nickname')
         if hasattr(UserModel, 'introduce'):
@@ -36,6 +45,9 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 
 class CustomRegisterSerializer(RegisterSerializer):
     profile_image = serializers.ImageField(use_url=True, required=False)
+    phone_number = serializers.CharField(max_length=11, validators=[
+        RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
+    ])
     nickname = serializers.CharField()
     introduce = serializers.CharField()
     
@@ -43,6 +55,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         data = super().get_cleaned_data()
         
         data['profile_image'] = self.validated_data.get('profile_image', '')
+        data['phone_number'] = self.validated_data.get('phone_number', '')
         data['nickname'] = self.validated_data.get('nickname', '')
         data['introduce'] = self.validated_data.get('introduce', '')
         
