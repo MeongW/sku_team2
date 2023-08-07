@@ -38,7 +38,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
             extra_fields.append('nickname')
         if hasattr(UserModel, 'introduce'):
             extra_fields.append('introduce')
-            
+        
         model = UserModel
         fields = ('pk', *extra_fields)
         read_only_fields = ('email',)
@@ -50,6 +50,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     ])
     nickname = serializers.CharField()
     introduce = serializers.CharField()
+    auth_answer = serializers.CharField()
     
     def get_cleaned_data(self):
         data = super().get_cleaned_data()
@@ -58,6 +59,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         data['phone_number'] = self.validated_data.get('phone_number', '')
         data['nickname'] = self.validated_data.get('nickname', '')
         data['introduce'] = self.validated_data.get('introduce', '')
+        data['auth_answer'] = self.validated_data.get('auth_answer', '')
         
         return data
 
