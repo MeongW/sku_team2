@@ -1,6 +1,6 @@
 import random, time, datetime
 import requests, json
-import base64, hmac, hashlib
+import base64, hmac, hashlib, bcrypt
 
 from django.utils import timezone
 from django.conf import settings
@@ -12,27 +12,33 @@ def user_directory_path(instance, filename):
     return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, nickname, email, introduce, password=None):
+    def create_user(self, username, nickname, phone_number, email, introduce, auth_answer, password=None):
         if not username:
             raise ValueError('Users must have an username')
+        hashed_auth_answer = bcrypt.hashpw(auth_answer.encode('utf-8'), bcrypt.gensalt())
+        hashed_auth_answer = hashed_auth_answer.decode('utf-8')
         user = self.model(
             username=username,
             nickname=nickname,
+            phone_number=phone_number,
             email=email,
             introduce=introduce,
+            auth_answer=hashed_auth_answer,
         )
         user.set_password(password)
         user.save(using = self.db)
         
         return user
     
-    def create_superuser(self, username, nickname, email, introduce, password=None):
+    def create_superuser(self, username, nickname, phone_number, email, introduce, auth_answer, password=None):
         user = self.create_user(
             username=username,
             nickname=nickname,
+            phone_number=phone_number,
             email=email,
             introduce=introduce,
             password=password,
+            auth_answer=auth_answer,
         )
         user.is_staff = True
         user.is_superuser = True
@@ -43,10 +49,12 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=50)
-    nickname = models.CharField(max_length=32)
-    email = models.EmailField()
+    nickname = models.CharField(max_length=32, unique=True)
+    phone_number = models.CharField(max_length=11, unique=True)
+    email = models.EmailField(unique=True)
     introduce = models.CharField(max_length=50)
     profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    auth_answer = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -56,7 +64,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['nickname', 'email', 'introduce']
+    REQUIRED_FIELDS = ['nickname', 'phone_number', 'email', 'introduce', 'auth_answer']
 
     def __str__(self):
         return self.username
