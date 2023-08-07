@@ -12,7 +12,8 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         nickname = data.get("nickname")
         introduce = data.get("introduce")
         auth_answer = data.get("auth_answer")
-                
+        phone_number = data.get("phone_number")
+        
         if profile_image:
             user.profile_image = profile_image
 
@@ -24,6 +25,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         
         if auth_answer:
             user.auth_answer = auth_answer
+        
+        if phone_number:
+            user.phone_number = phone_number
         
         user.save()
         return user

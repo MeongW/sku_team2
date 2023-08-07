@@ -10,7 +10,6 @@ from django.contrib.auth import get_user_model
 class IsSMSAuthenticated(BasePermission):
     def has_permission(self, request, view):
         phone_number = request.data.get('phone_number')
-        print(phone_number)
         query_set = SMSAuthentication.objects.filter(phone_number=phone_number)
         if query_set:
             if query_set[0].is_authenticated:
