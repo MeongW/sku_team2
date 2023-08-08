@@ -38,6 +38,11 @@ def get_secret(setting, secrets_dict=secrets):
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
+# SMS_NAVER_SECRET
+SMS_NAVER_ACCESS_KEY_ID = get_secret('SMS_NAVER_ACCESS_KEY_ID')
+SMS_NAVER_SECRET_KEY = get_secret('SMS_NAVER_SECRET_KEY')
+SMS_NAVER_SERVICE_ID = get_secret('SMS_NAVER_SERVICE_ID')
+SEND_PHONE_NUMBER = get_secret('SEND_PHONE_NUMBER')
 
 # Application definition
 DJANGO_APPS = [
@@ -130,9 +135,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko'
+LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -159,7 +164,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 # JWT setting
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication', # JMT 인증 방식
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 }
@@ -179,7 +184,9 @@ SIMPLE_JWT = {
 # dj_rest_auth setting
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    'REGISTER_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny', 'accounts.permissions.IsSMSAuthenticated'), 
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
 }
