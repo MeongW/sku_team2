@@ -37,8 +37,6 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/posts/', include('posts.urls')),
 
-    path('', include('posts.urls')),
-
     path('api_auth/', include('rest_framework.urls')),
 
     path('jwt-token-auth/', TokenObtainPairView.as_view(), name="token_obtain_pair"),
