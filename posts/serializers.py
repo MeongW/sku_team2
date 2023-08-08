@@ -1,52 +1,18 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
-
 from .models import Post, Comment, PostLike
+from rest_framework.serializers import ModelSerializer, ReadOnlyField
 
-class PostBaseModelSerializer(ModelSerializer):
+class PostSerializer(ModelSerializer):
+    # 작성자를 서버에 자동으로 넘겨준다.
+    writer = ReadOnlyField(source='wirter.nickname')
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['title', 'image', 'content', 'created_at', 'view_count', 'like_users', 'writer']
 
-class PostListModelSerializer(PostBaseModelSerializer):
-    class Meta(PostBaseModelSerializer.Meta):
-        fields = [
-            'id',
-            'title',
-            'image',
-            'content',
-            'created_at',
-            'view_count',
-            'writer',
-        ]
-        
-        depth = 1
-        
-class PostRetrieveModelSerializer(PostBaseModelSerializer):
-    class Meta(PostBaseModelSerializer.Meta):
-        depth = 1
+class CommentSerializer(ModelSerializer):
+    # 작성자를 서버에 자동으로 넘겨준다.
+    writer = ReadOnlyField(source='wirter.nickname')
 
-
-class PostCreateModelSerializer(PostBaseModelSerializer):
-    class Meta(PostBaseModelSerializer.Meta):
-        fields = [
-            'title',
-            'image',
-            'content',
-        ]
-        
-
-class PostDeleteModelSerializer(PostBaseModelSerializer):
-    pass
-
-
-class CommentListModelSerializer(ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
-
-
-class LikeModelSerializer(ModelSerializer):
-    class Meta:
-        model = PostLike
-        fields = '__all__'
-        depth = 1
+        fields = ['post', 'content', 'created_at', 'writer']
