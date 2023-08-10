@@ -88,7 +88,10 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         result = SMSAuthentication.check_auth_number(phone_number, auth_number)
         
         SMSAuthentication.objects.filter(phone_number=phone_number).update(is_authenticated=result)
-        return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
+        if result:
+            return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'success': result, 'data': serializer.data}, status=status.HTTP_400_BAD_REQUEST)
 
 class FindUserNameView(generics.GenericAPIView):
     permission_classes = [IsSMSAuthenticated, ]
