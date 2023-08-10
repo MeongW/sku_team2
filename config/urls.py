@@ -1,17 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth import views
 
 from rest_framework import permissions
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
-
+from posts.views import PostLikeAPIView, CategoryViewSet, CategorySearchViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,13 +31,9 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),   
     
     path('api/accounts/', include('accounts.urls')),
-    path('api/posts/', include('posts.urls')),
+    path('api/posts/', include('posts.urls'), name='post-list'),
 
-    path('', include('posts.urls')),
-
-    path('api_auth/', include('rest_framework.urls')),
-
-    path('jwt-token-auth/', TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path('jwt-token-auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('jwt-token-auth/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/posts/posts/<int:pk>/like/', PostLikeAPIView.as_view(), name='post-like'),
+    path('api/category/', CategoryViewSet.as_view(), name='post-category'),
+    path('api/category/<int:id>', CategorySearchViewSet.as_view(), name='post-category-search'),
 ]
