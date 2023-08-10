@@ -20,8 +20,13 @@ class CustomPasswordResetSerializer(PasswordChangeSerializer):
     username = serializers.CharField()
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):
+
+    nickname = serializers.CharField(max_length=32)
+    introduce = serializers.CharField(max_length=50)
+    profile_image = serializers.ImageField(use_url=True)
     class Meta:
-        extra_fields = []
+        extra_fields = ['username', 'email', 'profile_image', 'phone_number', 'nickname', 'introduce', ]
+        '''
         if hasattr(UserModel, 'USERNAME_FIELD'):
             extra_fields.append(UserModel.USERNAME_FIELD)
         if hasattr(UserModel, 'EMAIL_FIELD'):
@@ -38,10 +43,10 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
             extra_fields.append('nickname')
         if hasattr(UserModel, 'introduce'):
             extra_fields.append('introduce')
-        
+        '''
         model = UserModel
         fields = ('pk', *extra_fields)
-        read_only_fields = ('email',)
+        read_only_fields = ('email', 'username', 'phone_number')
 
 class CustomRegisterSerializer(RegisterSerializer):
     profile_image = serializers.ImageField(use_url=True, required=False)

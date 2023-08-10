@@ -2,6 +2,7 @@ from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter, Kaka
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.utils import user_username
+from allauth.account.utils import user_email
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +11,7 @@ from django.contrib.auth import get_user_model
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.views import PasswordChangeView
 from dj_rest_auth.serializers import PasswordResetConfirmSerializer
-from dj_rest_auth.views import sensitive_post_parameters_m
+from dj_rest_auth.views import sensitive_post_parameters_m, UserDetailsView
 from dj_rest_auth.app_settings import api_settings
 
 from rest_framework.response import Response
@@ -23,7 +24,9 @@ from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer, FindUserNa
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
+
 CustomUser = get_user_model()
+
 class CustomPasswordResetView(generics.GenericAPIView):
     """
     Calls Django Auth SetPasswordForm save method.
@@ -49,7 +52,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_signup_form_initial_data(self, sociallogin):
         user = sociallogin.user
         initial = {
-            "username": user_username(user) or "",
+            "username": user_email(user) or "",
         }
         return initial
 
