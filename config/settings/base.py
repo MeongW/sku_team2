@@ -77,6 +77,9 @@ THIRD_PARTY_APPS = [
     
     # swagger
     'drf_yasg',
+    
+    # cors
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +90,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -209,3 +213,10 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS=False
 ACCOUNT_LOGOUT_ON_GET = True
 LOGIN_REDIRECT_URL = '/'
+
+
+# cors setting
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+    'http://3.36.100.188',
+]

@@ -26,24 +26,6 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
     profile_image = serializers.ImageField(use_url=True)
     class Meta:
         extra_fields = ['username', 'email', 'profile_image', 'phone_number', 'nickname', 'introduce', ]
-        '''
-        if hasattr(UserModel, 'USERNAME_FIELD'):
-            extra_fields.append(UserModel.USERNAME_FIELD)
-        if hasattr(UserModel, 'EMAIL_FIELD'):
-            extra_fields.append(UserModel.EMAIL_FIELD)
-        if hasattr(UserModel, 'first_name'):
-            extra_fields.append('first_name')
-        if hasattr(UserModel, 'last_name'):
-            extra_fields.append('last_name')
-        if hasattr(UserModel, 'profile_image'):
-            extra_fields.append('profile_image')
-        if hasattr(UserModel, 'phone_number'):
-            extra_fields.append('phone_number')
-        if hasattr(UserModel, 'nickname'):
-            extra_fields.append('nickname')
-        if hasattr(UserModel, 'introduce'):
-            extra_fields.append('introduce')
-        '''
         model = UserModel
         fields = ('pk', *extra_fields)
         read_only_fields = ('email', 'username', 'phone_number')
