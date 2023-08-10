@@ -5,6 +5,7 @@ from allauth.account.utils import user_username
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.views import PasswordChangeView
@@ -18,11 +19,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 
 
-from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer
+from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer, FindUserNameSerializer
 from .models import SMSAuthentication
-from .permissions import IsUserInfoMatched
+from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
-
+CustomUser = get_user_model()
 class CustomPasswordResetView(generics.GenericAPIView):
     """
     Calls Django Auth SetPasswordForm save method.
@@ -86,5 +87,20 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         SMSAuthentication.objects.filter(phone_number=phone_number).update(is_authenticated=result)
         return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
 
-class FindUserNameView(APIView):
-    pass
+class FindUserNameView(generics.GenericAPIView):
+    permission_classes = [IsSMSAuthenticated, ]
+    serializer_class = FindUserNameSerializer
+    
+    def post(self, request):
+        data = request.data
+        serializer = FindUserNameSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        
+        phone_number = serializer.validated_data['phone_number']
+        
+        result = CustomUser.objects.filter(phone_number=phone_number)
+        
+        if result:
+            result = result[0].username
+            return Response({'success': True, 'username': result, 'data': serializer.data}, status=status.HTTP_200_OK)
+        return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
