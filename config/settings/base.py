@@ -216,6 +216,7 @@ LOGIN_REDIRECT_URL = '/'
 
 
 # cors setting
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
     'http://3.36.100.188',
