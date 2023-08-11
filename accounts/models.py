@@ -62,7 +62,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     
-    social_accounts = models.ManyToManyField(SocialAccount)
+    #social_accounts = models.ManyToManyField(SocialAccount)
     
     objects = CustomUserManager()
 
