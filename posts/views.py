@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Post, Comment, PostLike, Category
-from .serializers import PostSerializer, CommentSerializer, PostLikeSerializer, CategorySerializer
+from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
@@ -33,7 +33,7 @@ class PostViewSet(viewsets.ModelViewSet):
         elif action == 'create':
             authentication_classes = [TokenAuthentication]
         elif action == 'retrieve':
-            authentication_classes = []
+            authentication_classes = [TokenAuthentication]
         elif action == 'update':
             authentication_classes = [TokenAuthentication]
         elif action == 'partial_update':
@@ -50,15 +50,15 @@ class PostViewSet(viewsets.ModelViewSet):
         if action == 'list':
             permission_classes = [AllowAny] # 인증 / 비인증 모두 허용
         elif action == 'create':
-            permission_classes = [IsAuthenticated] # 인증된 요청에서만 veiw 호출
+            permission_classes = [IsAuthorOrReadonly]
         elif action == 'retrieve':
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthorOrReadonly]
         elif action == 'update':
-            permission_classes = [IsAdminUser] # Staff User에 대해서만 요청 허용
+            permission_classes = [IsAuthorOrReadonly]
         elif action == 'partial_update':
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthorOrReadonly]
         elif action == 'distory':
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthorOrReadonly]
         return [permission() for permission in permission_classes]
         
 
@@ -110,27 +110,21 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 
-# Post 한 게시물 좋아요
-class PostLikeAPIView(UpdateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostLikeSerializer
+## Post 한 게시물 좋아요 / 좋아요 수 기능
+class PostlikeViewSet(APIView):
+    def post(self, request, id, format=None):
+        post = Post.objects.get(id=id)
+        if request.data['like']=="yes":
+            if post.like_users.values().filter(username=request.user.username):
+                recommanded = PostLike.objects.filter(post=post, user=request.user)
+                recommanded.delete()
+            else:
+                PostLike.objects.create(post=post, user=request.user)
 
-    # update 메서드 오버라이딩
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        # 내부에 like + 1 로직 추가 (이후 serializer의 data변수에 dict 형태로 넣어줌)
-        data = {'like_count' : instance.like_count + 1}
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        like_count = PostLike.objects.values().filter(post=post).count()
+        post.save()
 
-        if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
+        return Response(like_count)
     
 
 
@@ -147,3 +141,11 @@ class CategorySearchViewSet(APIView):
         queryset = Post.objects.filter(category__id=id)
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+
+
+# 대댓글 보여주기
+class CommentOnlyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = BoardOnlySerializer
+    permission_classes = [AllowAny]
