@@ -1,4 +1,4 @@
-from .models import Post, Comment, PostLike, Category
+from .models import Post, Comment, Category
 from rest_framework.serializers import ModelSerializer, ReadOnlyField, SerializerMethodField
 
 
@@ -6,9 +6,28 @@ class CommentSerializer(ModelSerializer):
     # 작성자를 서버에 자동으로 넘겨준다.
     writer = ReadOnlyField(source='wirter.nickname')
 
+    reply = SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = ['post', 'content', 'created_at', 'writer']
+        fields = ['post', 'id', 'content', 'parent', 'created_at', 'writer', 'reply']
+
+    def get_reply(self, instance):
+        serializer = self.__class__(instance.reply, many=True)
+        serializer.bind('', self)
+        return serializer.data
+    
+class BoardOnlySerializer(ModelSerializer):
+    parent_comments = SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = ('id', 'parent_comments')
+
+    def get_parent_comments(self, obj):
+        parent_comments = obj.comments.filter(parent=None)
+        serializer = CommentSerializer(parent_comments, many=True)
+        return serializer.data
 
 
 class CategorySerializer(ModelSerializer):
@@ -20,12 +39,6 @@ class CategorySerializer(ModelSerializer):
 
     def get_count(self, obj):
         return Post.objects.filter(category__name=obj.name).count()
-
-
-class PostLikeSerializer(ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['like_count']
 
 
 class PostSerializer(ModelSerializer):

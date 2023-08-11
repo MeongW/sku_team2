@@ -30,6 +30,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
     post = models.ForeignKey(to='Post', related_name='comments', on_delete=models.CASCADE)
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    parent = models.ForeignKey('self', related_name='reply', on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return self.content
@@ -40,4 +41,4 @@ class PostLike(models.Model):
     like_at = models.DateTimeField(verbose_name='생성일', auto_now_add=True)
 
     def __str__(self):
-        return self.post
+        return self.like_at
