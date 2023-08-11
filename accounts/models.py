@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+from allauth.socialaccount.models import SocialAccount
 
 def user_directory_path(instance, filename):
     return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
@@ -51,15 +52,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=50)
     nickname = models.CharField(max_length=32, unique=True)
     phone_number = models.CharField(max_length=11, unique=True)
-    email = models.EmailField(unique=True)
-    introduce = models.CharField(max_length=50)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    introduce = models.CharField(max_length=50, null=True, blank=True)
     profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     auth_answer = models.CharField(max_length=100)
+    
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-
+    
+    social_accounts = models.ManyToManyField(SocialAccount)
+    
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'

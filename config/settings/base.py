@@ -44,6 +44,15 @@ SMS_NAVER_SECRET_KEY = get_secret('SMS_NAVER_SECRET_KEY')
 SMS_NAVER_SERVICE_ID = get_secret('SMS_NAVER_SERVICE_ID')
 SEND_PHONE_NUMBER = get_secret('SEND_PHONE_NUMBER')
 
+# NAVER_SECRET
+NAVER_CLIENT_ID = get_secret('NAVER_CLIENT_ID')
+NAVER_CLIENT_SECRET = get_secret('NAVER_CLIENT_SECRET')
+
+# KAKAO_SECRET
+KAKAO_REST_API_KEY = get_secret('KAKAO_REST_API_KEY')
+KAKAO_CLIENT_ID = get_secret('KAKAO_CLIENT_ID')
+KAKAO_CLIENT_SECRET = get_secret('KAKAO_CLIENT_SECRET')
+
 # Application definition
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -192,7 +201,10 @@ REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
     'USE_JWT': True,
-    'JWT_AUTH_HTTPONLY': False,
+    # 'JWT_AUTH_HTTPONLY': True,
+    # 'JWT_AUTH_COOKIE': 'access',
+    # 'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
+    'JWT_AUTH_RETURN_EXPIRATION': True,
 }
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 
@@ -214,10 +226,13 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS=False
 ACCOUNT_LOGOUT_ON_GET = True
 LOGIN_REDIRECT_URL = '/'
 
+SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
+
 
 # cors setting
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
+    'http://127.0.0.1:8000',
     'http://localhost:8000',
     'http://3.36.100.188',
 ]

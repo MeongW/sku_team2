@@ -1,5 +1,13 @@
 from django.urls import path, include
-from .views import SMSAuthSendView, SMSAuthConfirmView, CustomPasswordResetView, FindUserNameView
+from .views import (
+    SMSAuthSendView, 
+    SMSAuthConfirmView, 
+    CustomPasswordResetView, 
+    FindUserNameView,
+    kakao_callback,
+    kakao_login,
+    KakaoLogin,
+)
 
 from dj_rest_auth.views import (
     UserDetailsView,
@@ -21,10 +29,12 @@ urlpatterns = [
     
     path('dj-rest-auth/registration/', RegisterView.as_view(), name='rest_register'),
     
-    path('social/', include('allauth.urls')),
+    path('social/kakao/callback/', kakao_callback),
+    path('social/kakao/login/', kakao_login),
+    path('social/kakao/login/finish/', KakaoLogin.as_view()),
     
-    path('smsauth/send', SMSAuthSendView.as_view(), name='sms_auth_send'),
-    path('smsauth/confirm', SMSAuthConfirmView.as_view(), name="sms_auth_confirm"),
+    path('smsauth/send/', SMSAuthSendView.as_view(), name='sms_auth_send'),
+    path('smsauth/confirm/', SMSAuthConfirmView.as_view(), name="sms_auth_confirm"),
 
     path('finduser/', FindUserNameView.as_view(), name='find_user'),
     #path('social/kakao/', KakaoLogin.as_view(), name="kakao_login"),

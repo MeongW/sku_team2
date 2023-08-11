@@ -1,5 +1,12 @@
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.models import user_email
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 
+from rest_framework.response import Response
+from rest_framework import status
+
+from .models import CustomUser
 
 class CustomAccountAdapter(DefaultAccountAdapter):
 
@@ -30,4 +37,54 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             user.phone_number = phone_number
         
         user.save()
+        return user
+
+
+class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+    def get_signup_form_initial_data(self, sociallogin):
+        user = sociallogin.user
+        initial = {
+            "username": user_email(user) or "",
+        }
+        return initial
+    def pre_social_login(self, request, sociallogin):
+        if sociallogin.is_existing:
+            return Response({'detail': 'Social account is exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        email = sociallogin.user.email
+        if email:
+            try:
+                email_address = EmailAddress.objects.get(email=email)
+                sociallogin.connect(request, email_address.user)
+            except EmailAddress.DoesNotExist:
+                pass
+    def save_user(self, request, sociallogin, form=None):
+        user = super().save_user(request, sociallogin, form=form)
+        
+        provider = sociallogin.account.provider
+        uid = sociallogin.account.uid
+        nickname = sociallogin.account.extra_data.get('properties', {}).get('nickname', '')
+        if provider == 'kakao':
+            email = sociallogin.account.extra_data.get('kakao_account', {}).get('email', '')
+        if provider == 'naver':
+            email = sociallogin.account.extra_data.get('email', '')
+        phone_number = sociallogin.account.extra_data.get('account', {}).get('mobileNumber', '')
+        
+        email_existing_user = CustomUser.objects.filter(email=email).first()
+        phone_number_existing_user = CustomUser.objects.filter(phone_number=phone_number).first()
+        
+        if phone_number:
+            phone_number_existing_user.socialaccount_set.add(sociallogin.account)
+            return phone_number_existing_user
+        if email_existing_user:
+            email_existing_user.socialaccount_set.add(sociallogin.account)
+            return email_existing_user
+        
+        user.username = provider + '_' + uid
+        user.nickname = nickname
+        user.email = email
+        user.phone_number = phone_number
+        
+        user.save()
+        
         return user
