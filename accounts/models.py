@@ -113,7 +113,7 @@ class SMSAuthentication(models.Model):
         body = {
             "type": "SMS",
             "from": send_phone_number,
-            "content": f"[sku_team2] 인증번호 [{self.auth_number}]를 입력해주세요.",
+            "content": f"[토리] 인증번호 [{self.auth_number}]를 입력해주세요.",
             "messages": [
                 {
                     "to": self.phone_number,
