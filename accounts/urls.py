@@ -7,6 +7,9 @@ from .views import (
     kakao_callback,
     kakao_login,
     KakaoLogin,
+    naver_callback,
+    naver_login,
+    NaverLogin,
 )
 
 from dj_rest_auth.views import (
@@ -33,6 +36,10 @@ urlpatterns = [
     path('social/kakao/login/', kakao_login),
     path('social/kakao/login/finish/', KakaoLogin.as_view()),
     
+    path('social/naver/callback/', naver_callback),
+    path('social/naver/login/', naver_login),
+    path('social/naver/login/finish/', NaverLogin.as_view()),
+
     path('smsauth/send/', SMSAuthSendView.as_view(), name='sms_auth_send'),
     path('smsauth/confirm/', SMSAuthConfirmView.as_view(), name="sms_auth_confirm"),
 

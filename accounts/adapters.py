@@ -1,3 +1,7 @@
+import random
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.models import user_email
 from allauth.account.models import EmailAddress
@@ -63,28 +67,32 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         
         provider = sociallogin.account.provider
         uid = sociallogin.account.uid
-        nickname = sociallogin.account.extra_data.get('properties', {}).get('nickname', '')
+
         if provider == 'kakao':
-            email = sociallogin.account.extra_data.get('kakao_account', {}).get('email', '')
+            #email = sociallogin.account.extra_data.get('kakao_account', {}).get('email', '')
+            nickname = sociallogin.account.extra_data.get('properties', {}).get('nickname', '')
         if provider == 'naver':
-            email = sociallogin.account.extra_data.get('email', '')
-        phone_number = sociallogin.account.extra_data.get('account', {}).get('mobileNumber', '')
-        
-        email_existing_user = CustomUser.objects.filter(email=email).first()
-        phone_number_existing_user = CustomUser.objects.filter(phone_number=phone_number).first()
-        
-        if phone_number:
-            phone_number_existing_user.socialaccount_set.add(sociallogin.account)
-            return phone_number_existing_user
-        if email_existing_user:
-            email_existing_user.socialaccount_set.add(sociallogin.account)
-            return email_existing_user
-        
-        user.username = provider + '_' + uid
-        user.nickname = nickname
-        user.email = email
-        user.phone_number = phone_number
-        
+            #email = sociallogin.account.extra_data.get('email', '')
+            nickname = sociallogin.account.extra_data.get('nickname','')
+            #phone_number = sociallogin.account.extra_data.get('mobile', '').replace('-', '')
+
+
+        while True:
+            username = provider + '_' + str(random.randint(10000000, 100000000))
+            try:
+                CustomUser.objects.get(username=username)
+            except ObjectDoesNotExist:
+                user.username = username
+                break
+
+        while True:
+            nickname = provider + '_' + str(random.randint(10000000, 100000000))
+            try:
+                CustomUser.objects.get(nickname=nickname)
+            except ObjectDoesNotExist:
+                user.nickname = nickname
+                break
+            
         user.save()
         
         return user
