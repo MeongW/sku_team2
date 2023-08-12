@@ -4,19 +4,21 @@ from .models import SMSAuthentication
 
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
+from django.conf import settings
 
 from rest_framework import serializers
 
-from dj_rest_auth.serializers import UserDetailsSerializer, PasswordChangeSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer, PasswordResetSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
 UserModel = get_user_model()
 
-class CustomPasswordResetSerializer(PasswordChangeSerializer):
+class CustomPasswordResetSerializer(PasswordResetSerializer):
     auth_answer = serializers.CharField(max_length=100)
     phone_number = serializers.CharField(max_length=11, validators=[
         RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
-    ])
+    ], required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
     username = serializers.CharField()
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):
@@ -68,10 +70,10 @@ class SMSAuthConfirmSerializer(serializers.ModelSerializer):
         model = SMSAuthentication
         fields = ['phone_number', 'auth_number',]
 
-class FindUserNameSerializer(serializers.ModelSerializer):
+class FindUserNameSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=11, validators=[
         RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
     ])
-    class Meta:
-        model = UserModel
-        fields = ['phone_number']
+
+class SendUserNameSerializer(serializers.Serializer):
+    email = serializers.EmailField()

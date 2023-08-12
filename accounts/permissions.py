@@ -18,15 +18,28 @@ class IsSMSAuthenticated(BasePermission):
 
 class IsUserInfoMatched(BasePermission):
     def has_permission(self, request, view):
+        User = get_user_model()
+        
         username = request.data.get('username')
         auth_answer = request.data.get('auth_answer')
-        phone_number = request.data.get('phone_number')
         
-        User = get_user_model()
-        user_query_set = User.objects.filter(username=username, phone_number=phone_number)
+        phone_number = request.data.get('phone_number', '')
+        email = request.data.get('email', '')
+        
+        if phone_number == '' and email == '':
+            return False
+        
+        user_query_set = User.objects.filter(username=username, phone_number=phone_number, email=email).first()
+        
+        if not user_query_set:
+            if phone_number == '':
+                user_query_set = User.objects.filter(username=username, email=email).first()
+            if email == '':
+                user_query_set = User.objects.filter(username=username, phone_number=phone_number).first()
+        
         
         if user_query_set:
-            print(user_query_set[0].auth_answer)
-            if bcrypt.checkpw(auth_answer.encode('utf-8'), (user_query_set[0].auth_answer).encode('utf-8')):
+            print(user_query_set.auth_answer)
+            if bcrypt.checkpw(auth_answer.encode('utf-8'), (user_query_set.auth_answer).encode('utf-8')):
                 return True
         return False

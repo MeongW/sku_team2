@@ -6,14 +6,16 @@ from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.core.mail import EmailMessage
 
 from json.decoder import JSONDecodeError
 
 from dj_rest_auth.registration.views import SocialLoginView
-from dj_rest_auth.views import sensitive_post_parameters_m
 from dj_rest_auth.app_settings import api_settings
+from dj_rest_auth.views import PasswordResetView
 
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -22,33 +24,35 @@ from rest_framework.decorators import api_view, permission_classes
 
 import requests
 
-from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer, FindUserNameSerializer
+from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer, FindUserNameSerializer, SendUserNameSerializer
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
 
 CustomUser = get_user_model()
 
-class CustomPasswordResetView(generics.GenericAPIView):
-    """
-    Calls Django Auth SetPasswordForm save method.
-
-    Accepts the following POST parameters: new_password1, new_password2
-    Returns the success/fail message.
-    """
-    serializer_class = api_settings.PASSWORD_CHANGE_SERIALIZER
-    permission_classes = (IsUserInfoMatched,)
-    throttle_scope = 'dj_rest_auth'
-
-    @sensitive_post_parameters_m
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
+class CustomPasswordResetView(PasswordResetView):
+    permission_classes = [IsUserInfoMatched, ]
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'detail': _('New password has been saved.')})
+        
+        username = serializer.validated_data['username']
+        
+        #serializer.save()
+        try:
+            user = CustomUser.objects.filter(username=username).first()
+            
+            try:
+                temp_key = default_token_generator.make_token(user)
+                print(temp_key)
+            except:
+                return Response({'success': False, 'detail': 'Token generator error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            return Response({'uid': user.pk, 'token': temp_key}, status=status.HTTP_200_OK)
+        
+        except user.DoesNotExist:
+            return Response({'success': False, 'detail': 'Cannot found user.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSAuthSendView(generics.GenericAPIView):
     permission_classes = [AllowAny]
@@ -104,6 +108,37 @@ class FindUserNameView(generics.GenericAPIView):
             result = result[0].username
             return Response({'success': True, 'username': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+
+class SendUserNameView(generics.GenericAPIView):
+    permission_classes = [AllowAny, ]
+    serializer_class = SendUserNameSerializer
+    
+    def post(self, request):
+        data = request.data
+        serializer = SendUserNameSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        
+        email = serializer.validated_data['email']
+        
+        if email.is_valid():
+            pass
+        else:
+            return Response({'success': False, 'detail': 'Email field error.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        result = CustomUser.objects.filter(email=email).first()
+        
+        if result:
+            result = result.username
+            subject = "[토리] 계정 찾기 아이디 정보입니다."
+            message = result
+            to = [email, ]
+            try:
+                EmailMessage(subject=subject, body=message, to=to).send()
+                return Response({'success': True}, status=status.HTTP_200_OK)
+            except:
+                return Response({'success': False, 'detail': 'Email sending failed.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'success': False, 'detail': 'Cannot found account.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 BASE_URL = "http://localhost:8000/"
 
