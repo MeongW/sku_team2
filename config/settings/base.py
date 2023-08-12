@@ -228,6 +228,21 @@ LOGIN_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
 
+SOCIALACCOUNT_PROVIDERS = {
+    'Kakao': {
+        'APP': {
+            'client_id': KAKAO_CLIENT_ID,
+            'secret': KAKAO_CLIENT_SECRET,
+        }
+    },
+    'Naver': {
+        'APP': {
+            'client_id': NAVER_CLIENT_ID,
+            'secret': NAVER_CLIENT_SECRET
+        }
+    }
+}
+
 
 # cors setting
 CORS_ALLOW_CREDENTIALS = True

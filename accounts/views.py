@@ -2,11 +2,11 @@ from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.models import SocialAccount
+from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.core.mail import EmailMessage
@@ -15,16 +15,22 @@ from json.decoder import JSONDecodeError
 
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.app_settings import api_settings
-from dj_rest_auth.views import PasswordResetView
 
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 
+from dj_rest_auth.views import PasswordResetView
+
 import requests
 
-from .serializers import SMSSendSerializer, SMSAuthConfirmSerializer, FindUserNameSerializer, SendUserNameSerializer
+from .serializers import (
+    SMSSendSerializer, 
+    SMSAuthConfirmSerializer, 
+    FindUserNameSerializer, 
+    SendUserNameSerializer,
+)
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
@@ -33,19 +39,19 @@ CustomUser = get_user_model()
 
 class CustomPasswordResetView(PasswordResetView):
     permission_classes = [IsUserInfoMatched, ]
+    
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
         username = serializer.validated_data['username']
         
-        #serializer.save()
+        default_token_generator = EmailAwarePasswordResetTokenGenerator()
         try:
             user = CustomUser.objects.filter(username=username).first()
             
             try:
                 temp_key = default_token_generator.make_token(user)
-                print(temp_key)
             except:
                 return Response({'success': False, 'detail': 'Token generator error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
@@ -53,6 +59,7 @@ class CustomPasswordResetView(PasswordResetView):
         
         except user.DoesNotExist:
             return Response({'success': False, 'detail': 'Cannot found user.'}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class SMSAuthSendView(generics.GenericAPIView):
     permission_classes = [AllowAny]
