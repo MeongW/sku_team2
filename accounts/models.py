@@ -7,8 +7,6 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-from allauth.socialaccount.models import SocialAccount
-
 def user_directory_path(instance, filename):
     return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
 
@@ -61,8 +59,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-    
-    #social_accounts = models.ManyToManyField(SocialAccount)
     
     objects = CustomUserManager()
 

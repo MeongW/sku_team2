@@ -1,5 +1,3 @@
-import random
-
 from .models import SMSAuthentication
 
 from django.contrib.auth import get_user_model
