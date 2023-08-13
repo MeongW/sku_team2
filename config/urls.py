@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 from rest_framework import permissions
 
@@ -8,6 +10,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from posts.views import CategoryViewSet, CategorySearchViewSet, PostlikeViewSet
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,3 +40,5 @@ urlpatterns = [
     path('api/category/', CategoryViewSet.as_view(), name='post-category'),
     path('api/category/<int:id>', CategorySearchViewSet.as_view(), name='post-category-search'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

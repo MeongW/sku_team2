@@ -9,7 +9,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.core.mail import EmailMessage
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 from json.decoder import JSONDecodeError
 
@@ -18,7 +19,7 @@ from dj_rest_auth.app_settings import api_settings
 
 from rest_framework.response import Response
 from rest_framework import status, generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 
 from dj_rest_auth.views import PasswordResetView
@@ -113,6 +114,7 @@ class FindUserNameView(generics.GenericAPIView):
         
         if result:
             result = result[0].username
+            SMSAuthentication.objects.filter(phone_number=phone_number).delete()
             return Response({'success': True, 'username': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -124,10 +126,10 @@ class SendUserNameView(generics.GenericAPIView):
         data = request.data
         serializer = SendUserNameSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        
+
         email = serializer.validated_data['email']
         
-        if email.is_valid():
+        if serializer.is_valid():
             pass
         else:
             return Response({'success': False, 'detail': 'Email field error.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -137,19 +139,28 @@ class SendUserNameView(generics.GenericAPIView):
         if result:
             result = result.username
             subject = "[토리] 계정 찾기 아이디 정보입니다."
-            message = result
+            message = render_to_string('accounts/email/email_finduser.html', {'username': result})
             to = [email, ]
             try:
-                EmailMessage(subject=subject, body=message, to=to).send()
+                send_mail(subject, "_", settings.DEFAULT_FROM_EMAIL, to, html_message=message)
                 return Response({'success': True}, status=status.HTTP_200_OK)
-            except:
+            except Exception as e:
+                print(e)
                 return Response({'success': False, 'detail': 'Email sending failed.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({'success': False, 'detail': 'Cannot found account.'}, status=status.HTTP_400_BAD_REQUEST)
 
+class DeleteAccount(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user
+        user.delete()
+
+        return Response({"success": True}, status=status.HTTP_200_OK)
 
 BASE_URL = "http://localhost:8000/"
 
-KAKAO_CALLBACK_URI = "http://localhost:8000/api/accounts/social/kakao/callback/"  # 프론트 로그인 URI 입력
+KAKAO_CALLBACK_URI = "http://localhost:8000/api/accounts/social/kakao/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -183,7 +194,7 @@ def kakao_callback(request):
         social_account = SocialAccount.objects.filter(uid=uid, provider='Kakao')
         
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
@@ -194,9 +205,8 @@ def kakao_callback(request):
         return Response(accept_json, status=status.HTTP_200_OK)
     
     except social_account.DoesNotExist:
-        # 기존에 가입된 유저가 없으면 새로 가입
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
@@ -217,7 +227,7 @@ def kakao_login(request):
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
     )
 
-NAVER_CALLBACK_URI = "http://localhost:8000/api/accounts/social/naver/callback/"  # 프론트 로그인 URI 입력
+NAVER_CALLBACK_URI = "http://localhost:8000/api/accounts/social/naver/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -254,7 +264,7 @@ def naver_callback(request):
         social_account = SocialAccount.objects.filter(uid=uid, provider='Naver')
         
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
@@ -265,9 +275,8 @@ def naver_callback(request):
         return Response(accept_json, status=status.HTTP_200_OK)
     
     except social_account.DoesNotExist:
-        # 기존에 가입된 유저가 없으면 새로 가입
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish/", data=data)
+        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
