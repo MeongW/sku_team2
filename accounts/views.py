@@ -72,11 +72,13 @@ class SMSAuthSendView(generics.GenericAPIView):
         serializer = SMSSendSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         
-        sms_auth = SMSAuthentication.objects.filter(phone_number=serializer.validated_data['phone_number'])
+        phone_number = serializer.validate_data['phone_number']
+
+        sms_auth = SMSAuthentication.objects.filter(phone_number=phone_number)
         
         if sms_auth:
             sms_auth.delete()
-        SMSAuthentication.objects.create(phone_number=serializer.validated_data['phone_number'], is_authenticated = False)
+        SMSAuthentication.objects.create(phone_number=phone_number, is_authenticated = False)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -110,10 +112,13 @@ class FindUserNameView(generics.GenericAPIView):
         
         phone_number = serializer.validated_data['phone_number']
         
-        result = CustomUser.objects.filter(phone_number=phone_number)
+        result = CustomUser.objects.filter(phone_number=phone_number).first()
         
+        if SocialAccount.objects.filter(user=result).first():
+            return Response({'success': False, 'detail': 'Social account user.'}, status=status.HTTP_400_BAD_REQUEST)
+
         if result:
-            result = result[0].username
+            result = result.username
             SMSAuthentication.objects.filter(phone_number=phone_number).delete()
             return Response({'success': True, 'username': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
@@ -136,6 +141,9 @@ class SendUserNameView(generics.GenericAPIView):
         
         result = CustomUser.objects.filter(email=email).first()
         
+        if SocialAccount.objects.filter(user=result).first():
+            return Response({'success': False, 'detail': 'Social account user.'}, status=status.HTTP_400_BAD_REQUEST)
+
         if result:
             result = result.username
             subject = "[토리] 계정 찾기 아이디 정보입니다."
