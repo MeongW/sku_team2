@@ -96,8 +96,8 @@ class PostImageViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         file_obj = request.data['file']
-        image = PostImage.objects.create(file=file_obj, owner=request.user)
-        data = {'url': image.file.url}
+        image = PostImage.objects.create(image=file_obj, owner=request.user)
+        data = {'url': image.image.url}
         return Response(data, status=201)
 
 # Post 한 게시물에 댓글 목록 보기, 작성, 수정, 삭제
