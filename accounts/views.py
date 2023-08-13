@@ -175,9 +175,9 @@ class DeleteAccount(generics.GenericAPIView):
 
         return Response({"success": True}, status=status.HTTP_200_OK)
 
-BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://3.36.100.188/"
 
-KAKAO_CALLBACK_URI = "http://localhost:8000/api/accounts/social/kakao/callback"
+KAKAO_CALLBACK_URI = "http://3.36.100.188/api/accounts/social/kakao/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -244,7 +244,7 @@ def kakao_login(request):
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
     )
 
-NAVER_CALLBACK_URI = "http://localhost:8000/api/accounts/social/naver/callback"
+NAVER_CALLBACK_URI = "http://3.36.100.188/api/accounts/social/naver/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])

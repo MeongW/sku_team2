@@ -1,4 +1,4 @@
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, PostImage
 from rest_framework.serializers import ModelSerializer, ReadOnlyField, SerializerMethodField
 
 
@@ -52,4 +52,10 @@ class PostSerializer(ModelSerializer):
     
     class Meta:
         model = Post
-        fields = ['id', 'title', 'image', 'content', 'created_at', 'view_count', 'like_users', 'like_count', 'writer', 'comments', 'category']
+        fields = ['id', 'title', 'images', 'content', 'created_at', 'view_count', 'like_users', 'like_count', 'writer', 'comments', 'category']
+
+
+class PostImageSerializer(ModelSerializer):
+    class Meta:
+        model = PostImage
+        fields = ['image', ]

@@ -1,7 +1,9 @@
 import bcrypt
 
+from rest_framework import status
 from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import ValidationError
+
 from .models import SMSAuthentication
 
 from django.contrib.auth import get_user_model
@@ -10,6 +12,9 @@ from django.contrib.auth import get_user_model
 class IsSMSAuthenticated(BasePermission):
     def has_permission(self, request, view):
         phone_number = request.data.get('phone_number')
+        if phone_number == '':
+            raise ValidationError("[phone_number]Invalid value.", code=status.HTTP_400_BAD_REQUEST)
+
         query_set = SMSAuthentication.objects.filter(phone_number=phone_number)
         if query_set:
             if query_set[0].is_authenticated:
@@ -20,14 +25,18 @@ class IsUserInfoMatched(BasePermission):
     def has_permission(self, request, view):
         User = get_user_model()
         
-        username = request.data.get('username')
-        auth_answer = request.data.get('auth_answer')
-        
+        username = request.data.get('username', '')
+        auth_answer = request.data.get('auth_answer', '')
         phone_number = request.data.get('phone_number', '')
         email = request.data.get('email', '')
         
+        if username == '':
+            raise ValidationError("[auth_answer]Invalid value.", code=status.HTTP_400_BAD_REQUEST)
+        if auth_answer == '':
+            raise ValidationError("[auth_answer]Invalid value.", code=status.HTTP_400_BAD_REQUEST)
+
         if phone_number == '' and email == '':
-            return False
+            raise ValidationError("[phone_number or email]Invalid value.", code=status.HTTP_400_BAD_REQUEST)
         
         user_query_set = User.objects.filter(username=username, phone_number=phone_number, email=email).first()
         

@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Post, Comment, PostLike, Category
-from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer
-from rest_framework import viewsets
+from .models import Post, Comment, PostLike, Category, PostImage
+from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer
+from rest_framework import viewsets, status, permissions
+from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
@@ -12,7 +13,7 @@ from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from rest_framework.generics import UpdateAPIView
 from rest_framework import generics
 from rest_framework.views import APIView
-
+import os
 
 
 # Post의 목록, detail 보여주기, 수정하기, 삭제하기
@@ -60,8 +61,44 @@ class PostViewSet(viewsets.ModelViewSet):
         elif action == 'distory':
             permission_classes = [IsAuthorOrReadonly]
         return [permission() for permission in permission_classes]
-        
+    
+    def update(self, request, *args, **kwargs):
+        post = self.get_object()
+        old_images = set(post.images.all())
+        response = super().update(request, *args, **kwargs)
+        if response.status_code == status.HTTP_200_OK:
+            new_images = set(post.images.all())
+            unused_images = old_images - new_images
+            for img in unused_images:
+                img.file.delete(save=True)
+                img.delete()
+        return response
 
+    def destroy(self, request, *args, **kwargs):
+        post = self.get_object()
+        images = post.images.all()
+
+        response = super().destroy(request, *args, **kwargs)
+        if response.status_code == status.HTTP_204_NO_CONTENT:
+            for img in images:
+                img.file.delete(save=True)
+                img.delete()
+        return response
+        
+class PostImageViewSet(viewsets.ModelViewSet):
+    queryset = PostImage.objects.all()
+    serializer_class = PostImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        file_obj = request.data['file']
+        image = PostImage.objects.create(file=file_obj, owner=request.user)
+        data = {'url': image.file.url}
+        return Response(data, status=201)
 
 # Post 한 게시물에 댓글 목록 보기, 작성, 수정, 삭제
 class CommentViewSet(viewsets.ModelViewSet):

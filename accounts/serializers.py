@@ -1,3 +1,5 @@
+import bcrypt
+
 from .models import SMSAuthentication
 
 from django.contrib.auth import get_user_model
@@ -46,7 +48,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         data['phone_number'] = self.validated_data.get('phone_number', '')
         data['nickname'] = self.validated_data.get('nickname', '')
         data['introduce'] = self.validated_data.get('introduce', '')
-        data['auth_answer'] = self.validated_data.get('auth_answer', '')
+        data['auth_answer'] = bcrypt.hashpw(self.validated_data.get('auth_answer', '').encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         return data
 
