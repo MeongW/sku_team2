@@ -31,6 +31,7 @@ from .serializers import (
     SMSAuthConfirmSerializer, 
     FindUserNameSerializer, 
     SendUserNameSerializer,
+    CustomPasswordResetSerializer,
 )
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
@@ -38,9 +39,10 @@ from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
 CustomUser = get_user_model()
 
-class CustomPasswordResetView(PasswordResetView):
+class CustomPasswordResetView(generics.GenericAPIView):
     permission_classes = [IsUserInfoMatched, ]
-    
+    serializer_class = CustomPasswordResetSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -49,7 +51,7 @@ class CustomPasswordResetView(PasswordResetView):
         
         default_token_generator = EmailAwarePasswordResetTokenGenerator()
         try:
-            user = CustomUser.objects.filter(username=username).first()
+            user = CustomUser.objects.get(username=username)
             
             try:
                 temp_key = default_token_generator.make_token(user)
@@ -73,14 +75,20 @@ class SMSAuthSendView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         phone_number = serializer.validate_data['phone_number']
+        
+        try:
+            auth_user = CustomUser.objects.get(phone_number=phone_number)
 
-        sms_auth = SMSAuthentication.objects.filter(phone_number=phone_number)
+            sms_auth = SMSAuthentication.objects.filter(phone_number=phone_number).first()
+            
+            if sms_auth:
+                sms_auth.delete()
+            SMSAuthentication.objects.create(phone_number=phone_number, is_authenticated = False)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
-        if sms_auth:
-            sms_auth.delete()
-        SMSAuthentication.objects.create(phone_number=phone_number, is_authenticated = False)
-        
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        except auth_user.DoesNotExist:
+            return Response({'success':False, 'detail': 'User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSAuthConfirmView(generics.GenericAPIView):
     permission_classes = [AllowAny]
@@ -96,6 +104,7 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         result = SMSAuthentication.check_auth_number(phone_number, auth_number)
         
         SMSAuthentication.objects.filter(phone_number=phone_number).update(is_authenticated=result)
+        
         if result:
             return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         else:

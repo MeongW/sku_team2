@@ -6,12 +6,12 @@ from django.conf import settings
 
 from rest_framework import serializers
 
-from dj_rest_auth.serializers import UserDetailsSerializer, PasswordResetSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
 UserModel = get_user_model()
 
-class CustomPasswordResetSerializer(PasswordResetSerializer):
+class CustomPasswordResetSerializer(serializers.Serializer):
     auth_answer = serializers.CharField(max_length=100)
     phone_number = serializers.CharField(max_length=11, validators=[
         RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
