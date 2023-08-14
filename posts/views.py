@@ -26,7 +26,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
-    def Sort(self ,request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         posts = Post.objects.all()
         
         order = request.query_params.get('order')
@@ -34,6 +34,23 @@ class PostViewSet(viewsets.ModelViewSet):
             posts = posts.order_by('-like_count')
         else:
             posts = posts.order_by('-created_at')
+
+
+        mypage = request.query_params.get('mypage')
+        if mypage == 'posts':
+            if request.user.is_authenticated:
+                nickname = request.user.username
+                posts = posts.filter(writer__username=nickname)
+        elif mypage == 'comments':
+            if request.user.is_authenticated:
+                nickname = request.user.username
+                posts = posts.filter(comments__writer__username=nickname).distinct()
+        elif mypage == 'likes':
+            if request.user.is_authenticated:
+                nickname = request.user.username
+                posts = posts.filter(postlikes__writer__username=nickname)
+        else:
+            posts
         
         serializer = PostSerializer(posts, many=True)
         
@@ -170,12 +187,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 class PostlikeViewSet(APIView):
     def post(self, request, id, format=None):
         post = Post.objects.get(id=id)
-        if request.data['like']=="yes":
-            if post.like_users.values().filter(username=request.user.username):
-                recommanded = PostLike.objects.filter(post=post, user=request.user)
-                recommanded.delete()
-            else:
-                PostLike.objects.create(post=post, user=request.user)
+        if post.like_users.values().filter(username=request.user.username):
+            recommanded = PostLike.objects.filter(post=post, user=request.user)
+            recommanded.delete()
+        else:
+            PostLike.objects.create(post=post, user=request.user)
 
         post.like_count = PostLike.objects.values().filter(post=post).count()
         post.save()
