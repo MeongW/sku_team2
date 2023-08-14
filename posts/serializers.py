@@ -51,10 +51,10 @@ class PostSerializer(ModelSerializer):
 
     # 카테고리 추가
     category = CategorySerializer(many=False, read_only=True)
-    images = PostImageSerializer(many=True, required=False)
+    images = PostImageSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'images', 'created_at', 'view_count', 'like_users', 'like_count', 'writer', 'category']
+        fields = ['id', 'title', 'content', 'created_at', 'view_count', 'like_users', 'like_count', 'writer', 'category']
 
 
 class PostImageSerializer(ModelSerializer):
