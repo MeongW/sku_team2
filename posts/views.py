@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from .models import Post, Comment, PostLike, Category, PostImage
+from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer
 from rest_framework import viewsets, status, permissions
 from rest_framework.parsers import MultiPartParser
@@ -9,7 +11,6 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
-from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from rest_framework.generics import UpdateAPIView
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -19,11 +20,24 @@ import os
 # Post의 목록, detail 보여주기, 수정하기, 삭제하기
 class PostViewSet(viewsets.ModelViewSet):
 
-    queryset = Post.objects.all().order_by('-created_at')
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
+
+    def Sort(self ,request, *args, **kwargs):
+        posts = Post.objects.all()
+        
+        order = request.query_params.get('order')
+        if order == 'popular':
+            posts = posts.order_by('-like_count')
+        else:
+            posts = posts.order_by('-created_at')
+        
+        serializer = PostSerializer(posts, many=True)
+        
+        return Response(serializer.data)
 
     def get_authentications(self):
         authentication_classes = list()
@@ -34,7 +48,7 @@ class PostViewSet(viewsets.ModelViewSet):
         elif action == 'create':
             authentication_classes = [TokenAuthentication]
         elif action == 'retrieve':
-            authentication_classes = [TokenAuthentication]
+            authentication_classes = []
         elif action == 'update':
             authentication_classes = [TokenAuthentication]
         elif action == 'partial_update':
@@ -84,7 +98,10 @@ class PostViewSet(viewsets.ModelViewSet):
                 img.file.delete(save=True)
                 img.delete()
         return response
-        
+    
+    
+
+
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all()
     serializer_class = PostImageSerializer
@@ -97,8 +114,10 @@ class PostImageViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         file_obj = request.data['file']
         image = PostImage.objects.create(image=file_obj, owner=request.user)
-        data = {'url': image.image.url}
+        data = {'url': settings.BASE_URL + image.image.url}
         return Response(data, status=201)
+
+
 
 # Post 한 게시물에 댓글 목록 보기, 작성, 수정, 삭제
 class CommentViewSet(viewsets.ModelViewSet):
@@ -147,7 +166,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 
-## Post 한 게시물 좋아요 / 좋아요 수 기능
+## Post 한 게시물 좋아요 / 좋아요 수
 class PostlikeViewSet(APIView):
     def post(self, request, id, format=None):
         post = Post.objects.get(id=id)
@@ -158,11 +177,10 @@ class PostlikeViewSet(APIView):
             else:
                 PostLike.objects.create(post=post, user=request.user)
 
-        like_count = PostLike.objects.values().filter(post=post).count()
+        post.like_count = PostLike.objects.values().filter(post=post).count()
         post.save()
 
-        return Response(like_count)
-    
+        return Response(post.like_count)
 
 
 # Category
