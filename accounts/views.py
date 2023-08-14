@@ -74,7 +74,7 @@ class SMSAuthSendView(generics.GenericAPIView):
         serializer = SMSSendSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         
-        phone_number = serializer.validate_data['phone_number']
+        phone_number = serializer.validated_data['phone_number']
         
         try:
             auth_user = CustomUser.objects.get(phone_number=phone_number)
