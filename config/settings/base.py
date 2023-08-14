@@ -233,13 +233,13 @@ LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
-    'Kakao': {
+    'kakao': {
         'APP': {
             'client_id': KAKAO_CLIENT_ID,
             'secret': KAKAO_CLIENT_SECRET,
         }
     },
-    'Naver': {
+    'naver': {
         'APP': {
             'client_id': NAVER_CLIENT_ID,
             'secret': NAVER_CLIENT_SECRET
