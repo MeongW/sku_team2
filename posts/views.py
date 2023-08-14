@@ -29,13 +29,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         posts = Post.objects.all()
         
+        # 좋아요 순 / 최신 순 정렬
         order = request.query_params.get('order')
         if order == 'popular':
             posts = posts.order_by('-like_count')
         else:
             posts = posts.order_by('-created_at')
 
-
+        # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
         mypage = request.query_params.get('mypage')
         if mypage == 'posts':
             if request.user.is_authenticated:
@@ -48,13 +49,20 @@ class PostViewSet(viewsets.ModelViewSet):
         elif mypage == 'likes':
             if request.user.is_authenticated:
                 nickname = request.user.username
-                posts = posts.filter(postlikes__writer__username=nickname)
+                posts = posts.filter(postlikes__user__username=nickname)
         else:
             posts
+
+        #카테고리 별 아이디 값으로 해당 게시글 보이기
+        categoryId = request.query_params.get('categoryId', '')
+        if categoryId != '':
+            category = Category.objects.filter(pk=categoryId).first()
+            posts = posts.filter(category=category)
         
         serializer = PostSerializer(posts, many=True)
         
         return Response(serializer.data)
+
 
     def get_authentications(self):
         authentication_classes = list()
@@ -63,7 +71,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if action == 'list':
             authentication_classes = []
         elif action == 'create':
-            authentication_classes = [TokenAuthentication]
+            authentication_classes = []
         elif action == 'retrieve':
             authentication_classes = []
         elif action == 'update':
@@ -84,7 +92,7 @@ class PostViewSet(viewsets.ModelViewSet):
         elif action == 'create':
             permission_classes = [IsAuthorOrReadonly]
         elif action == 'retrieve':
-            permission_classes = [IsAuthorOrReadonly]
+            permission_classes = [AllowAny]
         elif action == 'update':
             permission_classes = [IsAuthorOrReadonly]
         elif action == 'partial_update':
@@ -141,6 +149,19 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+    def list(self ,request, *args, **kwargs):
+        comments = Comment.objects.all()
+
+        postId = request.query_params.get('postId', '')
+
+        if postId != '':
+            post = Post.objects.filter(pk=postId).first()
+            comments = Comment.objects.filter(post=post)
+        
+        serializer = self.get_serializer(comments, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_authentications(self):
         authentication_classes = list()

@@ -4,7 +4,7 @@ from rest_framework.serializers import ModelSerializer, ReadOnlyField, Serialize
 
 class CommentSerializer(ModelSerializer):
     # 작성자를 서버에 자동으로 넘겨준다.
-    writer = ReadOnlyField(source='wirter.nickname')
+    writer = ReadOnlyField(source='writer.nickname')
 
     reply = SerializerMethodField()
 
