@@ -40,10 +40,12 @@ class CategorySerializer(ModelSerializer):
     def get_count(self, obj):
         return Post.objects.filter(category__name=obj.name).count()
 
+
 class PostImageSerializer(ModelSerializer):
     class Meta:
         model = PostImage
         fields = ['image', ]
+
 
 class PostSerializer(ModelSerializer):
     # 작성자를 서버에 자동으로 넘겨준다.
