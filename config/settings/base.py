@@ -204,9 +204,10 @@ REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
     'USE_JWT': True,
-    # 'JWT_AUTH_HTTPONLY': True,
-    # 'JWT_AUTH_COOKIE': 'access',
-    # 'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
+    'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_COOKIE': 'access',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
+    'JWT_AUTH_COOKIE_SAMESITE': 'None',
     'JWT_AUTH_RETURN_EXPIRATION': True,
 }
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
