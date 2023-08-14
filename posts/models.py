@@ -21,7 +21,7 @@ class PostImage(models.Model):
 
 class Post(models.Model):
     title = models.CharField(verbose_name='제목', max_length=50)
-    images = models.ManyToManyField(PostImage)
+    images = models.ManyToManyField(PostImage, blank=True)
     content = models.TextField(verbose_name='내용')
     created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
     view_count = models.IntegerField(verbose_name='조회수', default=0)
