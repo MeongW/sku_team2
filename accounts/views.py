@@ -175,9 +175,9 @@ class DeleteAccount(generics.GenericAPIView):
 
         return Response({"success": True}, status=status.HTTP_200_OK)
 
-BASE_URL = "http://3.36.100.188/"
+BASE_URL = settings.BASE_URL
 
-KAKAO_CALLBACK_URI = "http://3.36.100.188/api/accounts/social/kakao/callback"
+KAKAO_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/kakao/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -211,7 +211,7 @@ def kakao_callback(request):
         social_account = SocialAccount.objects.filter(uid=uid, provider='Kakao')
         
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish", data=data)
+        accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
@@ -223,7 +223,7 @@ def kakao_callback(request):
     
     except social_account.DoesNotExist:
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/kakao/login/finish", data=data)
+        accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
@@ -244,7 +244,7 @@ def kakao_login(request):
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
     )
 
-NAVER_CALLBACK_URI = "http://3.36.100.188/api/accounts/social/naver/callback"
+NAVER_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/naver/callback"
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -281,7 +281,7 @@ def naver_callback(request):
         social_account = SocialAccount.objects.filter(uid=uid, provider='Naver')
         
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish", data=data)
+        accept = requests.post(f"{BASE_URL}/api/accounts/social/naver/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
@@ -293,7 +293,7 @@ def naver_callback(request):
     
     except social_account.DoesNotExist:
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/social/naver/login/finish", data=data)
+        accept = requests.post(f"{BASE_URL}/api/accounts/social/naver/login/finish", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
