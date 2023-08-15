@@ -6,7 +6,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'localhost',
     '3.36.100.188',
-    'servicetori.site',
+    'api.servicetori.site',
 ] # Domain N*ame or IP Address
 
 
@@ -127,8 +127,9 @@ LOGGING = {
 }
 
 
-BASE_URL = 'https://servicetori.site'
+BASE_URL = 'https://api.servicetori.site'
 
 CORS_ORIGIN_WHITELIST.append('https://servicetori.netlify.app')
+CORS_ORIGIN_WHITELIST.append('https://servicetori.site')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
