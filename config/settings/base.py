@@ -215,6 +215,8 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
     'JWT_AUTH_COOKIE_SAMESITE': 'None',
     'JWT_AUTH_RETURN_EXPIRATION': True,
+    'JWT_AUTH_COOKIE_USE_CSRF' : True,
+    'SESSION_LOGIN': False,
 }
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 
