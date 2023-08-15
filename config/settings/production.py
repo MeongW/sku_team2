@@ -127,3 +127,5 @@ LOGGING = {
 
 
 BASE_URL = 'http://3.36.100.188'
+
+CORS_ORIGIN_WHITELIST += 'https://servicetori.netlify.app'
