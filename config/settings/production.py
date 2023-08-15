@@ -6,6 +6,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'localhost',
     '3.36.100.188',
+    'servicetori.site',
 ] # Domain N*ame or IP Address
 
 
@@ -126,6 +127,6 @@ LOGGING = {
 }
 
 
-BASE_URL = 'http://3.36.100.188'
+BASE_URL = 'http://servicetori.site'
 
 CORS_ORIGIN_WHITELIST += 'https://servicetori.netlify.app'
