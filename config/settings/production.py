@@ -127,6 +127,6 @@ LOGGING = {
 }
 
 
-BASE_URL = 'http://servicetori.site'
+BASE_URL = 'https://servicetori.site'
 
 CORS_ORIGIN_WHITELIST.append('https://servicetori.netlify.app')
