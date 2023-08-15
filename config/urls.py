@@ -20,8 +20,8 @@ schema_view = get_schema_view(
         terms_of_service="http://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
-        url=f'{settings.BASE_URL}/swagger/',
     ),
+    url=f'{settings.BASE_URL}/swagger/',
     public=True,
     permission_classes=[permissions.AllowAny],
 )
