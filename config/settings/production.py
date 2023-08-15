@@ -130,3 +130,5 @@ LOGGING = {
 BASE_URL = 'https://servicetori.site'
 
 CORS_ORIGIN_WHITELIST.append('https://servicetori.netlify.app')
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
