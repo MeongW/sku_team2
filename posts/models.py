@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
 from accounts.models import CustomUser
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 User = get_user_model()
 
@@ -22,7 +23,7 @@ class PostImage(models.Model):
 class Post(models.Model):
     title = models.CharField(verbose_name='제목', max_length=50)
     images = models.ManyToManyField(PostImage, blank=True)
-    content = models.TextField(verbose_name='내용')
+    content = RichTextUploadingField(blank=True,null=True) # ckeditor
     created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
     view_count = models.IntegerField(verbose_name='조회수', default=0)
     like_users = models.ManyToManyField(CustomUser, through='PostLike', related_name='liked_posts')

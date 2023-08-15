@@ -89,6 +89,9 @@ THIRD_PARTY_APPS = [
     
     # cors
     'corsheaders',
+
+    # ckeditor
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -163,6 +166,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
