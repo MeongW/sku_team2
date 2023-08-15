@@ -14,11 +14,11 @@ from posts.views import CategoryViewSet, CategorySearchViewSet, PostlikeViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Snippets API",
+        title="Service Tori API",
         default_version='v1',
         description="Test description",
         terms_of_service="http://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@snippets.local"),
+        contact=openapi.Contact(email="servicetori@gmail.com"),
         license=openapi.License(name="BSD License"),
     ),
     url=f'{settings.BASE_URL}/swagger/',
