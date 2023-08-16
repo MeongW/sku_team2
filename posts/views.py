@@ -144,7 +144,7 @@ class PostImageViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         file_obj = request.data['file']
         image = PostImage.objects.create(image=file_obj, owner=request.user)
-        data = {'url': settings.BASE_URL + image.image.url}
+        data = {'url': settings.BASE_URL + image.image.url, 'id': image.pk}
         return Response(data, status=201)
 
 
