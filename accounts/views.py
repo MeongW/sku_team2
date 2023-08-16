@@ -240,8 +240,9 @@ class KakaoLogin(SocialLoginView):
 
 def kakao_login(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
+    redirect_uri = "https://servicetori.site/html/kakaoCallBack
     return redirect(
-        f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri=https://servicetori.site/html/callback&response_type=code"
+        f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
     )
 
 NAVER_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/naver/callback"
