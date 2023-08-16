@@ -274,6 +274,8 @@ CORS_ORIGIN_WHITELIST = [
     'https://api.servicetori.site',
 ]
 
+SESSION_COOKIE_SECURE=True
+
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
