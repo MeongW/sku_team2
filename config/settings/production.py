@@ -5,7 +5,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
-    '3.36.100.188',
+    '3.36.66.191',
     'api.servicetori.site',
 ] # Domain N*ame or IP Address
 
