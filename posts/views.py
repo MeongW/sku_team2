@@ -27,14 +27,9 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
+
         posts = Post.objects.all()
-        
-        # 좋아요 순 / 최신 순 정렬
-        order = request.query_params.get('order')
-        if order == 'popular':
-            posts = posts.order_by('-like_count')
-        else:
-            posts = posts.order_by('-created_at')
+
 
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
         mypage = request.query_params.get('mypage')
@@ -53,11 +48,21 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             posts
 
+
         #카테고리 별 아이디 값으로 해당 게시글 보이기
         categoryId = request.query_params.get('categoryId', '')
         if categoryId != '':
             category = Category.objects.filter(pk=categoryId).first()
             posts = posts.filter(category=category)
+
+
+        # 좋아요 순 / 최신 순 정렬
+        order = request.query_params.get('order')
+        if order == 'popular':
+            posts = posts.order_by('-like_count')
+        else:
+            posts = posts.order_by('-created_at')
+        
         
         serializer = PostSerializer(posts, many=True)
         
@@ -150,6 +155,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+    # 현재 게시물 id값 받아와서 해당 게시물의 댓글 보여주기
     def list(self ,request, *args, **kwargs):
         comments = Comment.objects.all()
 
@@ -206,6 +212,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 ## Post 한 게시물 좋아요 / 좋아요 수
 class PostlikeViewSet(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id, format=None):
         post = Post.objects.get(id=id)
         if post.like_users.values().filter(username=request.user.username):
