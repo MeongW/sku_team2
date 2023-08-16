@@ -185,7 +185,7 @@ def kakao_callback(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
     client_secret = getattr(settings, 'KAKAO_CLIENT_SECRET')
     code = request.GET.get("code")
-    redirect_uri = KAKAO_CALLBACK_URI
+    redirect_uri = "https://servicetori.site/html/callback.html"
     
     token_req = requests.get(
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&redirect_uri={redirect_uri}&code={code}&client_secret={client_secret}"
