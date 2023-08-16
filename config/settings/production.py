@@ -4,8 +4,11 @@ from .base import *
 DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = [
-    'api.servicetori.site',
+    'https://api.servicetori.site',
+    'https://servicetori.site',
 ]
+
+CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     'localhost',
