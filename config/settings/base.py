@@ -273,6 +273,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.servicetori\.site$",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
