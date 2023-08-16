@@ -183,7 +183,7 @@ BASE_URL = settings.BASE_URL
 
 KAKAO_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/kakao/callback"
 
-@api_view(["GET"])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def kakao_callback(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
