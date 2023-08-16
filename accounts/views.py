@@ -236,7 +236,7 @@ def kakao_callback(request):
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = KAKAO_CALLBACK_URI
+    callback_url = "https://servicetori.site/html/callback"
 
 def kakao_login(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
