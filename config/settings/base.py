@@ -264,7 +264,7 @@ CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
     'http://127.0.0.1:8080',
-    'http://3.36.100.188',
+    'http://3.36.66.191',
     'https://servicetori.site',
     'https://servicetori.netlify.app',
     'https://api.servicetori.site',
