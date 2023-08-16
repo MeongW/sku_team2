@@ -267,6 +267,13 @@ CORS_ALLOWED_ORIGINS = [
     'https://api.servicetori.site',
 ]
 
+CORS_ORIGIN_WHITELIST = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'https://servicetori.site',
+    'https://api.servicetori.site',
+]
+
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
