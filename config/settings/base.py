@@ -95,7 +95,7 @@ THIRD_PARTY_APPS = [
     'ckeditor_uploader',
 ]
 
-MIDDLEWARE = [,
+MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
