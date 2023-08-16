@@ -136,13 +136,13 @@ class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all()
     serializer_class = PostImageSerializer
     parser_classes = [MultiPartParser]
-    if request.user.is_authenticated:
-        nickname = request.user.username
-        print(nickname)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
     def create(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            nickname = request.user.username
+            print(nickname)
         file_obj = request.data['image']
         image = PostImage.objects.create(image=file_obj, owner=request.user)
         data = {'url': settings.BASE_URL + image.image.url, 'id': image.pk}
