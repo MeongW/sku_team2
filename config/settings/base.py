@@ -269,7 +269,9 @@ CORS_ALLOWED_ORIGINS = [
     'https://servicetori.netlify.app',
     'https://api.servicetori.site',
 ]
-
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://\w+\.servicetori\.site$",
+]
 
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
