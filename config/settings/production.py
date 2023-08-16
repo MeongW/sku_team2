@@ -3,6 +3,10 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+CSRF_TRUSTED_ORIGINS = [
+    'api.servicetori.site',
+]
+
 ALLOWED_HOSTS = [
     'localhost',
     '3.36.66.191',
