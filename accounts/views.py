@@ -60,7 +60,7 @@ class CustomPasswordResetView(generics.GenericAPIView):
             
             return Response({'uid': user.pk, 'token': temp_key}, status=status.HTTP_200_OK)
         
-        except user.DoesNotExist:
+        except CustomUser.DoesNotExist:
             return Response({'success': False, 'detail': 'Cannot found user.'}, status=status.HTTP_400_BAD_REQUEST)
         
 
@@ -87,7 +87,7 @@ class SMSAuthSendView(generics.GenericAPIView):
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        except sms_auth_user.DoesNotExist:
+        except CustomUser.DoesNotExist:
             return Response({'success':False, 'detail': 'User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSAuthConfirmView(generics.GenericAPIView):
@@ -221,7 +221,7 @@ def kakao_callback(request):
         
         return Response(accept_json, status=status.HTTP_200_OK)
     
-    except social_account.DoesNotExist:
+    except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
         accept_status = accept.status_code
@@ -292,7 +292,7 @@ def naver_callback(request):
         
         return Response(accept_json, status=status.HTTP_200_OK)
     
-    except social_account.DoesNotExist:
+    except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(f"{BASE_URL}/api/accounts/social/naver/login/finish", data=data)
         accept_status = accept.status_code
