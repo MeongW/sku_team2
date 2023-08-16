@@ -79,14 +79,14 @@ class SMSAuthSendView(generics.GenericAPIView):
         try:
             sms_auth = SMSAuthentication.objects.get(phone_number=phone_number)
             
-            if sms_auth:
-                sms_auth.delete()
-            SMSAuthentication.objects.create(phone_number=phone_number, is_authenticated = False)
-            
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
+            sms_auth.delete()
         except SMSAuthentication.DoesNotExist:
-            return Response({'success':False, 'detail': 'Auth phonenumber does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            pass
+            
+        SMSAuthentication.objects.create(phone_number=phone_number, is_authenticated = False)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 
 class SMSAuthConfirmView(generics.GenericAPIView):
     permission_classes = [AllowAny]
@@ -98,10 +98,15 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         
         phone_number = serializer.validated_data['phone_number']
         auth_number = serializer.validated_data['auth_number']
+
+        try:
+            auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
+        except SMSAuthentication.DoesNotExist:
+            return Response({'success': False, 'detail': 'Invalid phone number'}, status=status.HTTP_400_BAD_REQUEST)
         
         result = SMSAuthentication.check_auth_number(phone_number, auth_number)
         
-        SMSAuthentication.objects.filter(phone_number=phone_number).update(is_authenticated=result)
+        auth_phone.update(is_authenticated=result)
         
         if result:
             return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
