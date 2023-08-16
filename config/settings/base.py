@@ -217,7 +217,7 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE_SAMESITE': 'None',
     'JWT_AUTH_COOKIE_DOMAIN': '.servicetori.site',
     'JWT_AUTH_RETURN_EXPIRATION': True,
-    'JWT_AUTH_COOKIE_USE_CSRF' : True,
+    'JWT_AUTH_COOKIE_USE_CSRF' : False,
     'SESSION_LOGIN': False,
 }
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
@@ -274,7 +274,6 @@ CORS_ORIGIN_WHITELIST = [
     'https://api.servicetori.site',
 ]
 
-SESSION_COOKIE_SECURE=True
 
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
