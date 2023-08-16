@@ -92,6 +92,7 @@ THIRD_PARTY_APPS = [
 
     # ckeditor
     'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [

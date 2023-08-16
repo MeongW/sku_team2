@@ -11,7 +11,7 @@ def blog_image_upload_path(instance, filename):
 
 
 class Category(models.Model):
-    name = models.CharField(verbose_name='카테고리', max_length=20, null=True)
+    name = models.CharField(verbose_name='카테고리', max_length=20, null=False)
 
     def __str__(self) -> str:
         return f"Category Name: {self.name}"
@@ -29,7 +29,7 @@ class Post(models.Model):
     like_users = models.ManyToManyField(CustomUser, through='PostLike', related_name='liked_posts')
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     like_count = models.PositiveBigIntegerField(default=0)
-    category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=False, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"Title: {self.title}"
