@@ -135,7 +135,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all()
     serializer_class = PostImageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     parser_classes = [MultiPartParser]
 
     def perform_create(self, serializer):
