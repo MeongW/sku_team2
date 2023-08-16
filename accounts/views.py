@@ -77,7 +77,7 @@ class SMSAuthSendView(generics.GenericAPIView):
         phone_number = serializer.validated_data['phone_number']
         
         try:
-            auth_user = CustomUser.objects.get(phone_number=phone_number)
+            sms_auth_user = CustomUser.objects.get(phone_number=phone_number)
 
             sms_auth = SMSAuthentication.objects.filter(phone_number=phone_number).first()
             
@@ -87,7 +87,7 @@ class SMSAuthSendView(generics.GenericAPIView):
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        except auth_user.DoesNotExist:
+        except sms_auth_user.DoesNotExist:
             return Response({'success':False, 'detail': 'User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SMSAuthConfirmView(generics.GenericAPIView):
