@@ -129,8 +129,8 @@ LOGGING = {
 
 BASE_URL = 'https://api.servicetori.site'
 
-CORS_ORIGIN_WHITELIST.append('https://servicetori.netlify.app')
-CORS_ORIGIN_WHITELIST.append('https://servicetori.site')
-CORS_ORIGIN_WHITELIST.append('https://api.servicetori.site')
+CORS_ALLOWED_ORIGINS.append('https://servicetori.netlify.app')
+CORS_ALLOWED_ORIGINS.append('https://servicetori.site')
+CORS_ALLOWED_ORIGINS.append('https://api.servicetori.site')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
