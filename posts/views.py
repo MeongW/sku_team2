@@ -132,6 +132,7 @@ class PostViewSet(viewsets.ModelViewSet):
     
 
 
+# 이미지
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all()
     serializer_class = PostImageSerializer
@@ -146,6 +147,8 @@ class PostImageViewSet(viewsets.ModelViewSet):
         image = PostImage.objects.create(image=file_obj, owner=request.user)
         data = {'url': settings.BASE_URL + image.image.url, 'id': image.pk}
         return Response(data, status=201)
+
+
 
 
 
@@ -215,7 +218,7 @@ class PostlikeViewSet(APIView):
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, id, format=None):
         post = Post.objects.get(id=id)
         if post.like_users.values().filter(username=request.user.username):
@@ -237,13 +240,13 @@ class CategoryViewSet(APIView):
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
+
 # Category ID 값 당 게시글 찾기
 class CategorySearchViewSet(APIView):
     def get(self, request, id, format=None):
         queryset = Post.objects.filter(category__id=id)
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
-    
 
 
 # 대댓글 보여주기

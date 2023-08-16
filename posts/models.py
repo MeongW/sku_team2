@@ -29,7 +29,7 @@ class Post(models.Model):
     like_users = models.ManyToManyField(CustomUser, through='PostLike', related_name='liked_posts')
     writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     like_count = models.PositiveBigIntegerField(default=0)
-    category = models.ForeignKey(Category, null=False, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"Title: {self.title}"
