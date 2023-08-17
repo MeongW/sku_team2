@@ -21,7 +21,7 @@ import os
 class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    #serializer_class = PostSerializer
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
              return GetPostSerializer
