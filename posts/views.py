@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 import os
 
-class PostFilter2(django_filters.FilterSet):
+class PostFilter2(filters.FilterSet):
     mypage = django_filters.CharFilter(method='mypage_filter')
     order = django_filters.CharFilter(method='order_filter')
     categoryId = django_filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
