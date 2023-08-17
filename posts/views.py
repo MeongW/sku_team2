@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
+from django.db.models import Q
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer
@@ -19,54 +20,61 @@ from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 import os
 
+class PostFilter(filters.FilterSet):
+    mypage = filters.CharFilter(method='mypage_filter')
+    order = filters.CharFilter(method='order_filter')
+    categoryId = filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
+    search = filters.CharFilter(method='search_filter')
+
+    class Meta:
+        model = Post
+        fields = ['mypage', 'order', 'categoryId', 'search']
+
+    def mypage_filter(self, queryset, name, value):
+        request = self.request
+        mypage = value
+
+        if mypage == 'posts' and request.user.is_authenticated:
+            queryset = queryset.filter(writer=request.user)
+        elif mypage == 'comments' and request.user.is_authenticated:
+            queryset = queryset.filter(comments__writer=request.user).distinct()
+        elif mypage == 'likes' and request.user.is_authenticated:
+            queryset = queryset.filter(like_users=request.user)
+
+        return queryset
+
+    def order_filter(self, queryset, name, value):
+        order = value
+
+        if order == 'popular':
+            queryset = queryset.order_by('-like_count')
+        else:
+            queryset = queryset.order_by('-created_at')
+
+        return queryset
+
+    def search_filter(self, queryset, name, value):
+        search_param = value
+        return queryset.filter(Q(title__icontains=search_param) | Q(content__icontains=search_param))
 
 # Post의 목록, detail 보여주기, 수정하기, 삭제하기
 class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PostFilter
+    
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-        posts = Post.objects.all()
-
-        # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
-        mypage = request.query_params.get('mypage')
-        if mypage == 'posts':
-            if request.user.is_authenticated:
-                nickname = request.user.username
-                posts = posts.filter(writer__username=nickname)
-        elif mypage == 'comments':
-            if request.user.is_authenticated:
-                nickname = request.user.username
-                posts = posts.filter(comments__writer__username=nickname).distinct()
-        elif mypage == 'likes':
-            if request.user.is_authenticated:
-                nickname = request.user.username
-                posts = posts.filter(postlikes__user__username=nickname)
+        queryset = self.filter_queryset(self.get_queryset())
+        if queryset.exists():
+            serializer = GetPostSerializer(queryset, many=True)
+            return Response(serializer.data)
         else:
-            posts
-
-
-        #카테고리 별 아이디 값으로 해당 게시글 보이기
-        categoryId = request.query_params.get('categoryId', '')
-        if categoryId != '':
-            category = Category.objects.filter(pk=categoryId).first()
-            posts = posts.filter(category=category)
-
-
-        # 좋아요 순 / 최신 순 정렬
-        order = request.query_params.get('order')
-        if order == 'popular':
-            posts = posts.order_by('-like_count')
-        else:
-            posts = posts.order_by('-created_at')
-        
-        
-        serializer = GetPostSerializer(posts, many=True)
-        
-        return Response(serializer.data)
+            return Response([])
 
 
     def get_authentications(self):
@@ -263,22 +271,3 @@ class CommentOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.all()
     serializer_class = BoardOnlySerializer
     permission_classes = [AllowAny]
-
-
-
-# 제목, 내용으로 Post 검색
-class PostFilter(filters.FilterSet):
-
-    title = filters.CharFilter(lookup_expr='icontains')
-    content = filters.CharFilter(lookup_expr='icontains')
-
-    class Meta:
-        model = Post
-        fields = ['title', 'content']
-
-
-class SearchPostList(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = PostFilter
