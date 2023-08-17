@@ -122,7 +122,7 @@ class SMSAuthentication(models.Model):
             "x-ncp-iam-access-key": access_key,
             "x-ncp-apigw-signature-v2": signature,
         }
-        requests.post(url, data=json.dumps(body), headers=headers).json()
+        print(requests.post(url, data=json.dumps(body), headers=headers).json())
 
     @classmethod
     def check_auth_number(cls, phone_number, auth_number):
