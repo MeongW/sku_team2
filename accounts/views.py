@@ -7,7 +7,7 @@ from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -229,7 +229,10 @@ def kakao_callback(request):
         accept_json.pop('user', None)
         
         #return Response(accept_json, status=status.HTTP_200_OK)
-        return redirect('https://servicetori.site/html/')
+        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access_token',access_token)
+        return response
     
     except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -242,7 +245,10 @@ def kakao_callback(request):
         accept_json.pop('user', None)
 
         #return Response(accept_json, status=status.HTTP_201_CREATED)
-    return redirect('https://servicetori.site/html/')
+        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access_token',access_token)
+        return response
 
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
