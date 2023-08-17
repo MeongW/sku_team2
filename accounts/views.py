@@ -106,7 +106,7 @@ class SMSAuthConfirmView(generics.GenericAPIView):
             auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
             
             #result = SMSAuthentication.check_auth_number(phone_number, auth_number)
-            auth_phone.is_authenticated=True
+            auth_phone['is_authenticated']=True
         except SMSAuthentication.DoesNotExist:
             return Response({'success': False, 'detail': 'Invalid phone number'}, status=status.HTTP_400_BAD_REQUEST)
         
