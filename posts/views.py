@@ -70,6 +70,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.order_by('-pk')
         if queryset.exists():
             serializer = GetPostSerializer(queryset, many=True)
             return Response(serializer.data)
