@@ -21,7 +21,7 @@ import os
 class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
-    serializer_class = GetPostSerializer
+    serializer_class = PostSerializer
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
