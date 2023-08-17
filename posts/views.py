@@ -63,7 +63,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = PostFilter2
+    filterset_class = PostFilter
     
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
