@@ -32,7 +32,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-         queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset())
         if queryset.exists():
             serializer = GetPostSerializer(queryset, many=True)
             return Response(serializer.data)
