@@ -140,4 +140,5 @@ class SMSAuthentication(models.Model):
     def save(self, *args, **kwargs):
         self.auth_number = random.randint(1000, 10000)
         super().save(*args, **kwargs)
+        logger.info('222')
         self.send_sms()
