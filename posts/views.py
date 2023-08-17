@@ -61,7 +61,7 @@ class PostViewSet(viewsets.ModelViewSet):
             posts = posts.order_by('-created_at')
         
         
-        serializer = PostSerializer(posts, many=True)
+        serializer = GetPostSerializer(posts, many=True)
         
         return Response(serializer.data)
 
