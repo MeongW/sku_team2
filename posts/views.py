@@ -127,10 +127,6 @@ class PostViewSet(viewsets.ModelViewSet):
                 img.file.delete(save=True)
                 img.delete()
         return response
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return PostImageSerializer
-        return super().get_serializer_class()
     
 
 
