@@ -88,6 +88,7 @@ class SMSAuthentication(models.Model):
     
     def send_sms(self):
         logger.info("test-info")​​
+        
         timestamp = str(int(time.time() * 1000))
         access_key = getattr(
             settings,
