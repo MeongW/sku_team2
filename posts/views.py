@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
-from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer
+from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer
 from rest_framework import viewsets, status, permissions
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import api_view, action
@@ -22,7 +22,13 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+             return GetPostSerializer
+        elif self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
+            return PostSerializer
+        return super().get_serializer_class()
+        
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
