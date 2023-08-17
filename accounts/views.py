@@ -228,7 +228,8 @@ def kakao_callback(request):
         accept_json = accept.json()
         accept_json.pop('user', None)
         
-        return Response(accept_json, status=status.HTTP_200_OK)
+        #return Response(accept_json, status=status.HTTP_200_OK)
+        return redirect('https://servicetori.site/html/')
     
     except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -240,7 +241,8 @@ def kakao_callback(request):
         accept_json = accept.json()
         accept_json.pop('user', None)
 
-        return Response(accept_json, status=status.HTTP_201_CREATED)
+        #return Response(accept_json, status=status.HTTP_201_CREATED)
+    return redirect('https://servicetori.site/html/')
 
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
