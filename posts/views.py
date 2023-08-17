@@ -19,6 +19,42 @@ from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 import os
 
+class PostFilter2(django_filters.FilterSet):
+    mypage = django_filters.CharFilter(method='mypage_filter')
+    order = django_filters.CharFilter(method='order_filter')
+    categoryId = django_filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
+    search = django_filters.CharFilter(method='search_filter')
+
+    class Meta:
+        model = Post
+        fields = ['mypage', 'order', 'categoryId', 'search']
+
+    def mypage_filter(self, queryset, name, value):
+        request = self.request
+        mypage = value
+
+        if mypage == 'posts' and request.user.is_authenticated:
+            queryset = queryset.filter(writer=request.user)
+        elif mypage == 'comments' and request.user.is_authenticated:
+            queryset = queryset.filter(comments__writer=request.user).distinct()
+        elif mypage == 'likes' and request.user.is_authenticated:
+            queryset = queryset.filter(like_users=request.user)
+
+        return queryset
+
+    def order_filter(self, queryset, name, value):
+        order = value
+
+        if order == 'popular':
+            queryset = queryset.order_by('-like_count')
+        else:
+            queryset = queryset.order_by('-created_at')
+
+        return queryset
+
+    def search_filter(self, queryset, name, value):
+        search_param = value
+        return queryset.filter(Q(title__icontains=search_param) | Q(content__icontains=search_param))
 
 # Post의 목록, detail 보여주기, 수정하기, 삭제하기
 class PostViewSet(viewsets.ModelViewSet):
@@ -235,42 +271,6 @@ class CommentOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = BoardOnlySerializer
     permission_classes = [AllowAny]
 
-class PostFilter2(django_filters.FilterSet):
-    mypage = django_filters.CharFilter(method='mypage_filter')
-    order = django_filters.CharFilter(method='order_filter')
-    categoryId = django_filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
-    search = django_filters.CharFilter(method='search_filter')
-
-    class Meta:
-        model = Post
-        fields = ['mypage', 'order', 'categoryId', 'search']
-
-    def mypage_filter(self, queryset, name, value):
-        request = self.request
-        mypage = value
-
-        if mypage == 'posts' and request.user.is_authenticated:
-            queryset = queryset.filter(writer=request.user)
-        elif mypage == 'comments' and request.user.is_authenticated:
-            queryset = queryset.filter(comments__writer=request.user).distinct()
-        elif mypage == 'likes' and request.user.is_authenticated:
-            queryset = queryset.filter(like_users=request.user)
-
-        return queryset
-
-    def order_filter(self, queryset, name, value):
-        order = value
-
-        if order == 'popular':
-            queryset = queryset.order_by('-like_count')
-        else:
-            queryset = queryset.order_by('-created_at')
-
-        return queryset
-
-    def search_filter(self, queryset, name, value):
-        search_param = value
-        return queryset.filter(Q(title__icontains=search_param) | Q(content__icontains=search_param))
 
 # 제목, 내용으로 Post 검색
 class PostFilter(filters.FilterSet):
