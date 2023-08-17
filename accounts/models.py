@@ -87,7 +87,7 @@ class SMSAuthentication(models.Model):
         return base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
     
     def send_sms(self):
-        logger.error('Something went wrong!')​
+        logger.debug("--message--")​​
         timestamp = str(int(time.time() * 1000))
         access_key = getattr(
             settings,
