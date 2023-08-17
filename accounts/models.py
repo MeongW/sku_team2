@@ -87,7 +87,6 @@ class SMSAuthentication(models.Model):
         return base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
     
     def send_sms(self):
-        logger.info('123')
         timestamp = str(int(time.time() * 1000))
         access_key = getattr(
             settings,
@@ -123,7 +122,7 @@ class SMSAuthentication(models.Model):
             "x-ncp-iam-access-key": access_key,
             "x-ncp-apigw-signature-v2": signature,
         }
-        requests.post(url, data=json.dumps(body), headers=headers).json()
+        logger.info(requests.post(url, data=json.dumps(body), headers=headers).json())
 
     @classmethod
     def check_auth_number(cls, phone_number, auth_number):
@@ -140,5 +139,4 @@ class SMSAuthentication(models.Model):
     def save(self, *args, **kwargs):
         self.auth_number = random.randint(1000, 10000)
         super().save(*args, **kwargs)
-        logger.info('222')
         self.send_sms()
