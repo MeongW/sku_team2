@@ -22,12 +22,16 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-        
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GetPostSerializer
+        return self.serializer_class
+    
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-        self.serializer_class = GetPostSerializer
         posts = Post.objects.all()
 
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
