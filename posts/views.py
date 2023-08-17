@@ -21,12 +21,16 @@ import os
 class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
-    #serializer_class = PostSerializer
+    serializer_class = PostSerializer
+    serializer_classes = {
+        'list': GetPostSerializer,
+        'create': PostSerializer,
+    }
+
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
-             return GetPostSerializer
-        elif self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
-            return PostSerializer
+        if hasattr(self, 'serializer_classes'):
+            return self.serializer_classes.get(self.action, self.serializer_class)
+
         return super().get_serializer_class()
         
     def perform_create(self, serializer):
