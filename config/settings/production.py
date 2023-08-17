@@ -36,11 +36,17 @@ INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+DATABASE_USERNAME = get_secret('DATABASE_USERNAME')
+DATABASE_PASSWORD = get_secret('DATABASE_PASSWORD')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'servicetori',
+        'USER': DATABASE_USERNAME,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
