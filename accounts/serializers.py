@@ -40,6 +40,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     nickname = serializers.CharField()
     introduce = serializers.CharField()
     auth_answer = serializers.CharField()
+    email = serializers.EmailField(required=False, allow_blank=True)
     
     def get_cleaned_data(self):
         data = super().get_cleaned_data()
