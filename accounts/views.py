@@ -229,7 +229,7 @@ def kakao_callback(request):
         accept_json.pop('user', None)
         
         #return Response(accept_json, status=status.HTTP_200_OK)
-        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        tori_url = "https://servicetori.site/html/"
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access_token',access_token)
         return response
@@ -245,7 +245,7 @@ def kakao_callback(request):
         accept_json.pop('user', None)
 
         #return Response(accept_json, status=status.HTTP_201_CREATED)
-        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        tori_url = "https://servicetori.site/html/"
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access_token',access_token)
         return response
