@@ -24,7 +24,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from dj_rest_auth.views import PasswordResetView
 
-import requests
+import requests, logging
 
 from .serializers import (
     SMSSendSerializer, 
@@ -36,6 +36,7 @@ from .serializers import (
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
+logger = logging.getLogger(__name__)
 
 CustomUser = get_user_model()
 
