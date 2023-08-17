@@ -20,10 +20,10 @@ from rest_framework.filters import SearchFilter
 import os
 
 class PostFilter2(filters.FilterSet):
-    mypage = django_filters.CharFilter(method='mypage_filter')
-    order = django_filters.CharFilter(method='order_filter')
-    categoryId = django_filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
-    search = django_filters.CharFilter(method='search_filter')
+    mypage = filters.CharFilter(method='mypage_filter')
+    order = filters.CharFilter(method='order_filter')
+    categoryId = filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
+    search = filters.CharFilter(method='search_filter')
 
     class Meta:
         model = Post
