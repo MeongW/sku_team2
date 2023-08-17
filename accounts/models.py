@@ -122,7 +122,7 @@ class SMSAuthentication(models.Model):
             "x-ncp-iam-access-key": access_key,
             "x-ncp-apigw-signature-v2": signature,
         }
-        logger.info(body)
+        logger.info(json.dumps(body))
         logger.info(requests.post(url, data=json.dumps(body), headers=headers).json())
 
     @classmethod
