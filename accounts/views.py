@@ -226,15 +226,12 @@ def kakao_callback(request):
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
         
         accept_json = accept.json()
+        access_token = accept_json.pop('access')
         refresh_token = accept.headers['Set-Cookie']
         refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
         token_index = refresh_token.index(' refresh_token')
-        cookie_max_age = 3600 * 24 * 14 # 14 days
         refresh_token = refresh_token[token_index+1]
-        accept_json.pop('user', None)
-        logger.info(accept_json)
         
-        #return Response(accept_json, status=status.HTTP_200_OK)
         tori_url = "https://servicetori.site/html/"
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access_token',access_token)
@@ -249,15 +246,12 @@ def kakao_callback(request):
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
 
         accept_json = accept.json()
+        access_token = accept_json.pop('access')
         refresh_token = accept.headers['Set-Cookie']
         refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
         token_index = refresh_token.index(' refresh_token')
-        cookie_max_age = 3600 * 24 * 14 # 14 days
         refresh_token = refresh_token[token_index+1]
-        accept_json.pop('user', None)
-        logger.info(accept_json)
 
-        #return Response(accept_json, status=status.HTTP_201_CREATED)
         tori_url = "https://servicetori.site/html/"
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access_token',access_token)
