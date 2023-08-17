@@ -58,3 +58,12 @@ class PostSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'images', 'writer', 'content', 'created_at', 'like_users', 'like_count', 'category']
+
+class GetPostSerializer(ModelSerializer):
+    writer = ReadOnlyField(source='writer.nickname')
+    
+    category = CategorySerializer(many=False, read_only=True)
+    images = PostImageSerializer(many=True, required=False, read_only=True)
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'images', 'writer', 'content', 'created_at', 'like_users', 'like_count', 'category']

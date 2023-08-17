@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
-from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer
+from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer
 from rest_framework import viewsets, status, permissions
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import api_view, action
@@ -25,12 +25,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-
         posts = Post.objects.all()
 
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
@@ -66,7 +64,7 @@ class PostViewSet(viewsets.ModelViewSet):
             posts = posts.order_by('-created_at')
         
         
-        serializer = PostSerializer(posts, many=True)
+        serializer = GetPostSerializer(posts, many=True)
         
         return Response(serializer.data)
 
@@ -85,7 +83,7 @@ class PostViewSet(viewsets.ModelViewSet):
             authentication_classes = [TokenAuthentication]
         elif action == 'partial_update':
             authentication_classes = [TokenAuthentication]
-        elif action == 'distory':
+        elif action == 'distroy':
             authentication_classes = [TokenAuthentication]
         return [authentication() for authentication in authentication_classes]
 
@@ -104,7 +102,7 @@ class PostViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthorOrReadonly]
         elif action == 'partial_update':
             permission_classes = [IsAuthorOrReadonly]
-        elif action == 'distory':
+        elif action == 'distroy':
             permission_classes = [IsAuthorOrReadonly]
         return [permission() for permission in permission_classes]
     
@@ -131,13 +129,13 @@ class PostViewSet(viewsets.ModelViewSet):
                 img.delete()
         return response
     
-    
 
 
 # 이미지
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all()
     serializer_class = PostImageSerializer
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser]
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
