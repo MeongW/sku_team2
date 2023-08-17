@@ -61,6 +61,8 @@ class PostSerializer(ModelSerializer):
 
 class GetPostSerializer(ModelSerializer):
     writer = ReadOnlyField(source='writer.nickname')
+    
+    category = CategorySerializer(many=False, read_only=True)
     images = PostImageSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Post
