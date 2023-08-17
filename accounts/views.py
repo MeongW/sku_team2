@@ -189,7 +189,7 @@ KAKAO_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/kakao/callback"
 def kakao_callback(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
     client_secret = getattr(settings, 'KAKAO_CLIENT_SECRET')
-    code = request.data
+    code = request.data.get('code', '')
     logger.info(code)
     if code is None:
         return Response({'success': False, 'detail': 'Code Error.'}, status=status.HTTP_400_BAD_REQUEST)
