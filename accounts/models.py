@@ -1,12 +1,12 @@
 import random, time, datetime
-import requests, json
+import requests, json, logging
 import base64, hmac, hashlib, bcrypt
 
 from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
+logger = logging.getLogger(__name__)
 def user_directory_path(instance, filename):
     return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
 
@@ -87,6 +87,7 @@ class SMSAuthentication(models.Model):
         return base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
     
     def send_sms(self):
+        logger.error('Something went wrong!')​
         timestamp = str(int(time.time() * 1000))
         access_key = getattr(
             settings,
