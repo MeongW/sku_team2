@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer
@@ -14,6 +16,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import UpdateAPIView
 from rest_framework import generics
 from rest_framework.views import APIView
+from rest_framework.filters import SearchFilter
 import os
 
 
@@ -262,3 +265,22 @@ class CommentOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.all()
     serializer_class = BoardOnlySerializer
     permission_classes = [AllowAny]
+
+
+
+# 제목, 내용으로 Post 검색
+class PostFilter(filters.FilterSet):
+
+    title = filters.CharFilter(lookup_expr='icontains')
+    content = filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
+
+
+class SearchPostList(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PostFilter

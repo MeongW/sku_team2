@@ -93,6 +93,9 @@ THIRD_PARTY_APPS = [
     # ckeditor
     'ckeditor',
     'ckeditor_uploader',
+
+    #django filter
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -190,6 +193,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
+
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
 REST_USE_JWT = True

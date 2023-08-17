@@ -9,7 +9,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from posts.views import CategoryViewSet, CategorySearchViewSet, PostlikeViewSet
+from posts.views import CategoryViewSet, CategorySearchViewSet, PostlikeViewSet, SearchPostList
 
 
 schema_view = get_schema_view(
@@ -41,6 +41,8 @@ urlpatterns = [
     path('api/posts/posts/<int:id>/like/', PostlikeViewSet.as_view(), name='post-like'),
     path('api/category/', CategoryViewSet.as_view(), name='post-category'),
     path('api/category/<int:id>', CategorySearchViewSet.as_view(), name='post-category-search'),
+
+    path('search/', SearchPostList.as_view())
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
