@@ -23,13 +23,12 @@ class PostImage(models.Model):
 class Post(models.Model):
     title = models.CharField(verbose_name='제목', max_length=50)
     images = models.ManyToManyField(PostImage, blank=True)
+    writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     content = RichTextUploadingField(blank=True,null=True) # ckeditor
     created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
-    view_count = models.IntegerField(verbose_name='조회수', default=0)
     like_users = models.ManyToManyField(CustomUser, through='PostLike', related_name='liked_posts')
-    writer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     like_count = models.PositiveBigIntegerField(default=0)
-    category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=False, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"Title: {self.title}"

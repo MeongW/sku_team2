@@ -10,7 +10,7 @@ class CommentSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['post', 'id', 'content', 'parent', 'created_at', 'writer', 'reply']
+        fields = ['id', 'post', 'writer', 'content', 'created_at', 'parent', 'reply']
 
     def get_reply(self, instance):
         serializer = self.__class__(instance.reply, many=True)
@@ -31,11 +31,12 @@ class BoardOnlySerializer(ModelSerializer):
 
 
 class CategorySerializer(ModelSerializer):
+
     count = SerializerMethodField() # serializer에만 존재하는 필드
 
     class Meta:
         model = Category
-        fields = ['name', 'count', 'id',]
+        fields = ['id', 'name', 'count']
 
     def get_count(self, obj):
         return Post.objects.filter(category__name=obj.name).count()
@@ -44,7 +45,7 @@ class CategorySerializer(ModelSerializer):
 class PostImageSerializer(ModelSerializer):
     class Meta:
         model = PostImage
-        fields = ['image', ]
+        fields = ['image']
 
 
 class PostSerializer(ModelSerializer):
@@ -52,8 +53,8 @@ class PostSerializer(ModelSerializer):
     writer = ReadOnlyField(source='writer.nickname')
 
     # 카테고리 추가
-    category = CategorySerializer(many=False, read_only=True)
+    #category = CategorySerializer(many=False, read_only=True)
     images = PostImageSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'images', 'created_at', 'view_count', 'like_users', 'like_count', 'writer', 'category']
+        fields = ['id', 'title', 'images', 'writer', 'content', 'created_at', 'like_users', 'like_count', 'category']

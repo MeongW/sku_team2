@@ -30,7 +30,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
         posts = Post.objects.all()
 
-
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
         mypage = request.query_params.get('mypage')
         if mypage == 'posts':
@@ -76,7 +75,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if action == 'list':
             authentication_classes = []
         elif action == 'create':
-            authentication_classes = []
+            authentication_classes = [TokenAuthentication]
         elif action == 'retrieve':
             authentication_classes = []
         elif action == 'update':
@@ -156,15 +155,26 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    # 현재 게시물 id값 받아와서 해당 게시물의 댓글 보여주기
+    
     def list(self ,request, *args, **kwargs):
         comments = Comment.objects.all()
 
         postId = request.query_params.get('postId', '')
 
+        # 현재 게시물 id값 받아와서 해당 게시물의 댓글 보여주기
         if postId != '':
             post = Post.objects.filter(pk=postId).first()
             comments = Comment.objects.filter(post=post)
+
+
+        # 댓글 등록 순 / 최신 순 정렬
+        order = request.query_params.get('order')
+        if order == 'newest':
+            comments = comments.order_by('-created_at')
+        elif order == 'registration':
+            comments
+        else:
+            comments
         
         serializer = self.get_serializer(comments, many=True)
 
@@ -195,15 +205,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         if action == 'list':
             permission_classes = [AllowAny] # 인증 / 비인증 모두 허용
         elif action == 'create':
-            permission_classes = [IsAuthenticated] # 인증된 요청에서만 veiw 호출
+            permission_classes = [IsAuthorOrReadonly] # 인증된 요청에서만 veiw 호출
         elif action == 'retrieve':
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
         elif action == 'update':
-            permission_classes = [IsAdminUser] # Staff User에 대해서만 요청 허용
+            permission_classes = [IsAuthorOrReadonly] # Staff User에 대해서만 요청 허용
         elif action == 'partial_update':
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthorOrReadonly]
         elif action == 'distory':
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthorOrReadonly]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -214,7 +224,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 ## Post 한 게시물 좋아요 / 좋아요 수
 class PostlikeViewSet(APIView):
 
-    authentication_classes = [TokenAuthentication]
+    #authentication_classes = []
     permission_classes = [IsAuthenticated]
 
     def post(self, request, id, format=None):
