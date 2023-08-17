@@ -42,7 +42,7 @@ urlpatterns = [
     path('api/category/', CategoryViewSet.as_view(), name='post-category'),
     path('api/category/<int:id>', CategorySearchViewSet.as_view(), name='post-category-search'),
 
-    path('search/', SearchPostList.as_view())
+    path('api/posts/search/', SearchPostList.as_view())
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
