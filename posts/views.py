@@ -27,7 +27,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-        serializer_class = GetPostSerializer
+        self.serializer_class = GetPostSerializer
         posts = Post.objects.all()
 
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
@@ -82,7 +82,7 @@ class PostViewSet(viewsets.ModelViewSet):
             authentication_classes = [TokenAuthentication]
         elif action == 'partial_update':
             authentication_classes = [TokenAuthentication]
-        elif action == 'distory':
+        elif action == 'distroy':
             authentication_classes = [TokenAuthentication]
         return [authentication() for authentication in authentication_classes]
 
@@ -101,7 +101,7 @@ class PostViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthorOrReadonly]
         elif action == 'partial_update':
             permission_classes = [IsAuthorOrReadonly]
-        elif action == 'distory':
+        elif action == 'distroy':
             permission_classes = [IsAuthorOrReadonly]
         return [permission() for permission in permission_classes]
     
