@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 import os
 
-class PostFilter2(filters.FilterSet):
+class PostFilter(filters.FilterSet):
     mypage = filters.CharFilter(method='mypage_filter')
     order = filters.CharFilter(method='order_filter')
     categoryId = filters.ModelChoiceFilter(field_name='category', queryset=Category.objects.all())
@@ -271,21 +271,3 @@ class CommentOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.all()
     serializer_class = BoardOnlySerializer
     permission_classes = [AllowAny]
-
-
-# 제목, 내용으로 Post 검색
-class PostFilter(filters.FilterSet):
-
-    title = filters.CharFilter(lookup_expr='icontains')
-    content = filters.CharFilter(lookup_expr='icontains')
-
-    class Meta:
-        model = Post
-        fields = ['title', 'content']
-
-
-class SearchPostList(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = PostFilter
