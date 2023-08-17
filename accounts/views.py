@@ -193,7 +193,7 @@ def kakao_callback(request):
     logger.info(code)
     if code is None:
         return Response({'success': False, 'detail': 'Code Error.'}, status=status.HTTP_400_BAD_REQUEST)
-    redirect_uri = "https://servicetori.site/html/kakaoCallback"
+    redirect_uri = "https://servicetori.site/html/kakaocallback"
     
     token_req = requests.get(
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&redirect_uri={redirect_uri}&code={code}&client_secret={client_secret}"
@@ -249,7 +249,7 @@ class KakaoLogin(SocialLoginView):
 
 def kakao_login(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
-    redirect_uri = "https://servicetori.site/html/kakaoCallBack"
+    redirect_uri = "https://servicetori.site/html/kakaocallback"
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
     )
