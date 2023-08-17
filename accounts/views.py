@@ -101,8 +101,7 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         auth_number = serializer.validated_data['auth_number']
 
         result = False
-        auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
-        auth_phone.is_authenticated = True
+        
         try:
             auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
             
@@ -110,7 +109,9 @@ class SMSAuthConfirmView(generics.GenericAPIView):
             auth_phone.is_authenticated = True
         except SMSAuthentication.DoesNotExist:
             return Response({'success': False, 'detail': 'Invalid phone number'}, status=status.HTTP_400_BAD_REQUEST)
-        
+        auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
+        auth_phone.is_authenticated = True
+        result = True
         if result:
             return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         else:
