@@ -26,7 +26,6 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(writer=self.request.user)
 
     def list(self, request, *args, **kwargs):
-        serializer_class = GetPostSerializer
         posts = Post.objects.all()
 
         # 마이페이지 - 작성한글 / 댓글 단 글 / 좋아요한 글
