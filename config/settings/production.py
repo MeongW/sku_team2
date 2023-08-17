@@ -12,7 +12,8 @@ CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    '3.36.66.191',
+    'servicetori.site',
+    '3.37.123.210',
     'api.servicetori.site',
 ] # Domain N*ame or IP Address
 
