@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
+from django.db.models import Q
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer
