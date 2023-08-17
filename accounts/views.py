@@ -189,6 +189,7 @@ def kakao_callback(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
     client_secret = getattr(settings, 'KAKAO_CLIENT_SECRET')
     code = request.POST.get('code')
+    logger.info(code)
     if code == '':
         return Response({'success': False, 'detail': 'Code Error.'}, status=status.HTTP_400_BAD_REQUEST)
     redirect_uri = KAKAO_CALLBACK_URI
@@ -197,6 +198,7 @@ def kakao_callback(request):
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&redirect_uri={redirect_uri}&code={code}&client_secret={client_secret}"
     )
     token_req_json = token_req.json()
+    logger.info(token_req_json)
     error = token_req_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
