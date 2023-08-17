@@ -103,7 +103,7 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         result = False
         
         auth_phone = SMSAuthentication.objects.filter(phone_number=phone_number)
-        if auth_phone.exists():
+        if auth_phone:
             result = SMSAuthentication.check_auth_number(phone_number, auth_number)
             logger.info(result)
             auth_phone.update(is_authenticated=result)
