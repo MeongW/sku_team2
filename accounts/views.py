@@ -247,7 +247,9 @@ def kakao_callback(request):
     except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
+        logger.info(accept)
         accept_status = accept.status_code
+        
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
 
