@@ -66,7 +66,7 @@ class SMSAuthConfirmSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(max_length=11, validators=[
         RegexValidator(regex=r"^01([0|1|6|7|8|9])?\d{3,4}?\d{4}$", message='전화번호 형식이 잘못되었습니다.')
     ])
-    auth_number = serializers.IntegerField(min_value=1000, max_value=9999)
+    auth_number = serializers.CharField()
     class Meta:
         model = SMSAuthentication
         fields = ['phone_number', 'auth_number',]
