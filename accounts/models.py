@@ -1,12 +1,12 @@
 import random, time, datetime
-import requests, json
+import requests, json, logging
 import base64, hmac, hashlib, bcrypt
 
 from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
+logger = logging.getLogger(__name__)
 def user_directory_path(instance, filename):
     return 'users/{}/{}'.format(instance.username, "profile_image." + filename.split('.')[-1])
 
@@ -47,9 +47,9 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(unique=True, max_length=50)
-    nickname = models.CharField(max_length=32, unique=True)
-    phone_number = models.CharField(max_length=11, unique=True)
+    username = models.CharField(unique=True, max_length=50, blank=True, null = True)
+    nickname = models.CharField(max_length=32, unique=True, blank=True, null = True)
+    phone_number = models.CharField(max_length=11, unique=True, blank=True, null = True)
     email = models.EmailField(unique=True, null=True, blank=True)
     introduce = models.CharField(max_length=50, null=True, blank=True)
     profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
@@ -68,6 +68,26 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+    def clean(self):
+        if not self.email:
+            self.email = None
+        if not self.phone_number:
+            self.phone_number = None
+        if not self.nickname:
+            self.nickname = None
+        if not self.username:
+            self.nickname = None
+        super(MyModel, self).clean()
+    def validate_unique(self, exclude=None):
+        if not self.email:
+            return
+        if not self.phone_number:
+            return
+        if not self.nickname:
+            return
+        if not self.username:
+            return
+        super().validate_unique(exclude=exclude)
 
 class SMSAuthentication(models.Model):
     phone_number = models.CharField(verbose_name='휴대폰번호', max_length=11, unique=True)
@@ -122,7 +142,7 @@ class SMSAuthentication(models.Model):
             "x-ncp-iam-access-key": access_key,
             "x-ncp-apigw-signature-v2": signature,
         }
-        requests.post(url, data=json.dumps(body), headers=headers).json()
+        logger.info(requests.post(url, data=json.dumps(body), headers=headers).json())
 
     @classmethod
     def check_auth_number(cls, phone_number, auth_number):

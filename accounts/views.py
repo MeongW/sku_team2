@@ -7,7 +7,7 @@ from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -24,7 +24,8 @@ from rest_framework.decorators import api_view, permission_classes
 
 from dj_rest_auth.views import PasswordResetView
 
-import requests
+import requests, logging
+from datetime import timedelta
 
 from .serializers import (
     SMSSendSerializer, 
@@ -36,6 +37,7 @@ from .serializers import (
 from .models import SMSAuthentication
 from .permissions import IsUserInfoMatched, IsSMSAuthenticated
 
+logger = logging.getLogger(__name__)
 
 CustomUser = get_user_model()
 
@@ -92,7 +94,8 @@ class SMSAuthConfirmView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = SMSAuthConfirmSerializer
     def post(self, request):
-        data = request.data
+        data = request.data.get('code','')
+        logger.info(data)
         serializer = SMSAuthConfirmSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         
@@ -101,14 +104,13 @@ class SMSAuthConfirmView(generics.GenericAPIView):
 
         result = False
         
-        try:
-            auth_phone = SMSAuthentication.objects.get(phone_number=phone_number)
-            
+        auth_phone = SMSAuthentication.objects.filter(phone_number=phone_number)
+        if auth_phone:
             result = SMSAuthentication.check_auth_number(phone_number, auth_number)
-            auth_phone.is_authenticated=result
-        except SMSAuthentication.DoesNotExist:
+            auth_phone.update(is_authenticated=result)
+        else:
             return Response({'success': False, 'detail': 'Invalid phone number'}, status=status.HTTP_400_BAD_REQUEST)
-        
+            
         if result:
             return Response({'success': result, 'data': serializer.data}, status=status.HTTP_200_OK)
         else:
@@ -183,18 +185,22 @@ BASE_URL = settings.BASE_URL
 
 KAKAO_CALLBACK_URI = f"{BASE_URL}/api/accounts/social/kakao/callback"
 
-@api_view(["POST"])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def kakao_callback(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
     client_secret = getattr(settings, 'KAKAO_CLIENT_SECRET')
-    code = request.GET.get("code")
+    code = request.GET.get('code')
+    logger.info(code)
+    if code is None:
+        return Response({'success': False, 'detail': 'Code Error.'}, status=status.HTTP_400_BAD_REQUEST)
     redirect_uri = KAKAO_CALLBACK_URI
     
     token_req = requests.get(
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&redirect_uri={redirect_uri}&code={code}&client_secret={client_secret}"
     )
     token_req_json = token_req.json()
+    logger.info(token_req_json)
     error = token_req_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
@@ -221,30 +227,66 @@ def kakao_callback(request):
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
         
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        access_token = accept_json.pop('access')
+        refresh_token = accept.headers['Set-Cookie']
+        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
+        token_index = refresh_token.index(' refresh_token')
+        refresh_token = refresh_token[token_index+1]
         
-        return Response(accept_json, status=status.HTTP_200_OK)
+        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access',access_token, httponly=True)
+        response.set_cookie('refresh_token',refresh_token, httponly=True)
+        
+        return response
+    
+        # accept_json.pop('user', None)
+        
+        # return Response(accept_json, status=status.HTTP_200_OK)
     
     except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
+        logger.info(accept)
         accept_status = accept.status_code
+        
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        access_token = accept_json.pop('access')
+        refresh_token = accept.headers['Set-Cookie']
+        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
+        token_index = refresh_token.index(' refresh_token')
+        refresh_token = refresh_token[token_index+1]
 
-        return Response(accept_json, status=status.HTTP_201_CREATED)
+        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access',access_token, httponly=True)
+        response.set_cookie('refresh_token',refresh_token, httponly=True)
+
+        return response
+
+        # accept_json.pop('user', None)
+        
+        # return Response(accept_json, status=status.HTTP_200_OK)
 
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
 
+    # def _create_response(self, data, response_class):
+    #     redirect_url = "https://servicetori.site/html/kakaoCallBack"
+    #     url = f"{redirect_url}?code={data['access_token']}"
+        
+    #     return HttpResponseRedirect(url)
+
+    
+
 def kakao_login(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
-    redirect_uri = "https://servicetori.site/html/kakaoCallBack"
+    redirect_uri = KAKAO_CALLBACK_URI
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
     )
