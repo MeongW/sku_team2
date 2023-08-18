@@ -68,12 +68,12 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         provider = sociallogin.account.provider
         uid = sociallogin.account.uid
 
-        if provider == 'kakao':
+        #if provider == 'kakao':
             #email = sociallogin.account.extra_data.get('kakao_account', {}).get('email', '')
-            nickname = sociallogin.account.extra_data.get('properties', {}).get('nickname', '')
-        if provider == 'naver':
+            #nickname = sociallogin.account.extra_data.get('properties', {}).get('nickname', '')
+        #if provider == 'naver':
             #email = sociallogin.account.extra_data.get('email', '')
-            nickname = sociallogin.account.extra_data.get('nickname','')
+            #nickname = sociallogin.account.extra_data.get('nickname','')
             #phone_number = sociallogin.account.extra_data.get('mobile', '').replace('-', '')
 
 
@@ -92,7 +92,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except ObjectDoesNotExist:
                 user.nickname = nickname
                 break
-            
+        
         user.save()
         
         return user
