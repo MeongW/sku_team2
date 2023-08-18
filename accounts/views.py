@@ -214,61 +214,7 @@ def kakao_callback(request):
     if error is not None:
         raise JSONDecodeError(error)
     uid = str(profile_json.get("id"))
-    '''
-    try:
-        social_account = SocialAccount.objects.filter(uid=uid, provider='Kakao')
-        
-        data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
-        accept_status = accept.status_code
-        if accept_status != 200:
-            return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
-        
-        accept_json = accept.json()
-        access_token = accept_json.pop('access')
-        refresh_token = accept.headers['Set-Cookie']
-        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
-        token_index = refresh_token.index(' refresh_token')
-        refresh_token = refresh_token[token_index+1]
-        
-        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
-        response = HttpResponseRedirect(tori_url)
-        response.set_cookie('access',access_token, httponly=True)
-        response.set_cookie('refresh_token',refresh_token, httponly=True)
-        
-        return response
-    
-        # accept_json.pop('user', None)
-        
-        # return Response(accept_json, status=status.HTTP_200_OK)
-    
-    except SocialAccount.DoesNotExist:
-        data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}/api/accounts/social/kakao/login/finish", data=data)
-        logger.info(accept)
-        accept_status = accept.status_code
-        
-        if accept_status != 200:
-            return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
 
-        accept_json = accept.json()
-        access_token = accept_json.pop('access')
-        refresh_token = accept.headers['Set-Cookie']
-        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
-        token_index = refresh_token.index(' refresh_token')
-        refresh_token = refresh_token[token_index+1]
-
-        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
-        response = HttpResponseRedirect(tori_url)
-        response.set_cookie('access',access_token, httponly=True)
-        response.set_cookie('refresh_token',refresh_token, httponly=True)
-
-        return response
-
-        # accept_json.pop('user', None)
-        
-        # return Response(accept_json, status=status.HTTP_200_OK)
-    '''
     try:
         social_account = SocialAccount.objects.filter(uid=uid, provider='Kakao')
         
