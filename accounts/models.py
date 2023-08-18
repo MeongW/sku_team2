@@ -77,7 +77,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.nickname = None
         if not self.username:
             self.nickname = None
-        super(MyModel, self).clean()
+        super(CustomUser, self).clean()
     def validate_unique(self, exclude=None):
         if not self.email:
             return
