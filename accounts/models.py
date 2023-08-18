@@ -68,7 +68,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
+    def clean(self):
+        if not self.email:
+            self.email = None
+        if not self.phone_number:
+            self.phone_number = None
+        if not self.nickname:
+            self.nickname = None
+        if not self.username:
+            self.nickname = None
+        super(MyModel, self).clean()
     def validate_unique(self, exclude=None):
         if not self.email:
             return
