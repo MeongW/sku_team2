@@ -233,12 +233,16 @@ def kakao_callback(request):
         token_index = refresh_token.index(' refresh_token')
         refresh_token = refresh_token[token_index+1]
         
-        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
-        response = HttpResponseRedirect(tori_url)
-        response.set_cookie('access',access_token, httponly=True)
-        response.set_cookie('refresh_token',refresh_token, httponly=True)
+        # tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        # response = HttpResponseRedirect(tori_url)
+        # response.set_cookie('access',access_token, httponly=True)
+        # response.set_cookie('refresh_token',refresh_token, httponly=True)
         
-        return response
+        # return response
+    
+        accept_json.pop('user', None)
+        
+        return Response(accept_json, status=status.HTTP_200_OK)
     
     except SocialAccount.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -254,17 +258,29 @@ def kakao_callback(request):
         token_index = refresh_token.index(' refresh_token')
         refresh_token = refresh_token[token_index+1]
 
-        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
-        response = HttpResponseRedirect(tori_url)
-        response.set_cookie('access',access_token, httponly=True)
-        response.set_cookie('refresh_token',refresh_token, httponly=True)
+        # tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        # response = HttpResponseRedirect(tori_url)
+        # response.set_cookie('access',access_token, httponly=True)
+        # response.set_cookie('refresh_token',refresh_token, httponly=True)
 
-        return response
+        # return response
+
+        accept_json.pop('user', None)
+        
+        return Response(accept_json, status=status.HTTP_200_OK)
 
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = KAKAO_CALLBACK_URI
+
+    def _create_response(self, data, response_class):
+        redirect_url = "https://servicetori.site/html/kakaoCallBack"
+        url = f"{redirect_url}?code={data['access_token']}"
+        
+        return HttpResponseRedirect(url)
+
+    
 
 def kakao_login(request):
     rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
