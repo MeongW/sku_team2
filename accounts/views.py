@@ -281,8 +281,20 @@ def kakao_callback(request):
         
         accept_json = accept.json()
         accept_json.pop('user', None)
+        access_token = accept_json.pop('access')
+        refresh_token = accept.headers['Set-Cookie']
+        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
+        token_index = refresh_token.index(' refresh_token')
+        refresh_token = refresh_token[token_index+1]
+
+        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access',access_token, httponly=True)
+        response.set_cookie('refresh_token',refresh_token, httponly=True)
+
+        return response
         
-        return Response(accept_json, status=status.HTTP_200_OK)
+        #return Response(accept_json, status=status.HTTP_200_OK)
     
     except social_account.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -294,7 +306,22 @@ def kakao_callback(request):
         accept_json = accept.json()
         accept_json.pop('user', None)
 
-        return Response(accept_json, status=status.HTTP_201_CREATED)
+        
+        requests.post("https://api.servicetori.site/api/accounts/social/kakao/login", data=accept_json)
+
+        access_token = accept_json.pop('access')
+        refresh_token = accept.headers['Set-Cookie']
+        refresh_token = refresh_token.replace('=',';').replace(',',';').split(';')
+        token_index = refresh_token.index(' refresh_token')
+        refresh_token = refresh_token[token_index+1]
+
+        tori_url = "https://servicetori.site/html/kakaoCallBack?code=" + access_token
+        response = HttpResponseRedirect(tori_url)
+        response.set_cookie('access',access_token, httponly=True)
+        response.set_cookie('refresh_token',refresh_token, httponly=True)
+
+        return response
+        #return Response(accept_json, status=status.HTTP_201_CREATED)
 class KakaoLogin(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
     client_class = OAuth2Client
