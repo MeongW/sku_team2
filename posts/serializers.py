@@ -1,6 +1,13 @@
 from .models import Post, Comment, Category, PostImage
+from accounts.models import CustomUser
 from rest_framework.serializers import ModelSerializer, ReadOnlyField, SerializerMethodField
 
+
+class WriterSerializer(ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = ['nickname', 'profile_image']
 
 class CommentSerializer(ModelSerializer):
     # 작성자를 서버에 자동으로 넘겨준다.
@@ -52,6 +59,7 @@ class PostSerializer(ModelSerializer):
     # 작성자를 서버에 자동으로 넘겨준다.
     writer = ReadOnlyField(source='writer.nickname')
 
+    
     # 카테고리 추가
     #category = CategorySerializer(many=False, read_only=True)
     #images = PostImageSerializer(many=True, required=False, read_only=True)
@@ -60,10 +68,26 @@ class PostSerializer(ModelSerializer):
         fields = ['id', 'title', 'images', 'writer', 'content', 'created_at', 'like_users', 'like_count', 'category']
 
 class GetPostSerializer(ModelSerializer):
-    writer = ReadOnlyField(source='writer.nickname')
+    writer = WriterSerializer(read_only=True)
     
     category = CategorySerializer(many=False, read_only=True)
     images = PostImageSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Post
         fields = ['id', 'title', 'images', 'writer', 'content', 'created_at', 'like_users', 'like_count', 'category']
+
+
+class GetCommentSerializer(ModelSerializer):
+    # 작성자를 서버에 자동으로 넘겨준다.
+    writer = WriterSerializer(read_only=True)
+
+    reply = SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'writer', 'content', 'created_at', 'parent', 'reply']
+
+    def get_reply(self, instance):
+        serializer = self.__class__(instance.reply, many=True)
+        serializer.bind('', self)
+        return serializer.data

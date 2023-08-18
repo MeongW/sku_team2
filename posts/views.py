@@ -7,7 +7,7 @@ from django_filters import rest_framework as filters
 from django.db.models import Q
 from .models import Post, Comment, PostLike, Category, PostImage
 from .permissions import IsAuthorOrReadonly, IsAuthorUpdateOrReadOnly
-from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer
+from .serializers import PostSerializer, CommentSerializer, CategorySerializer, BoardOnlySerializer, PostImageSerializer, GetPostSerializer, GetCommentSerializer
 from rest_framework import viewsets, status, permissions
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import api_view, action
@@ -185,7 +185,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             comments
         
-        serializer = self.get_serializer(comments, many=True)
+        serializer = GetCommentSerializer(comments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
