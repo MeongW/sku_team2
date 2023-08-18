@@ -94,17 +94,13 @@ class SMSAuthConfirmView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = SMSAuthConfirmSerializer
     def post(self, request):
-        data = request.data.get('code','')
         logger.info(data)
         serializer = SMSAuthConfirmSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         
         phone_number = serializer.validated_data['phone_number']
         auth_number = serializer.validated_data['auth_number']
-        try:
-            auth_number = int(auth_number)
-        except:
-            auth_number = 0
+
         result = False
         
         auth_phone = SMSAuthentication.objects.filter(phone_number=phone_number)
