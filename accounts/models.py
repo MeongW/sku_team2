@@ -69,6 +69,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+    def validate_unique(self, exclude=None):
+        if not self.email:
+            return
+        if not self.phone_number:
+            return
+        if not self.nickname:
+            return
+        if not self.username:
+            return
+        super().validate_unique(exclude=exclude)
+
 class SMSAuthentication(models.Model):
     phone_number = models.CharField(verbose_name='휴대폰번호', max_length=11, unique=True)
     auth_number = models.IntegerField(verbose_name='인증번호')
