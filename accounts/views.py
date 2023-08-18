@@ -233,12 +233,11 @@ def kakao_callback(request):
         token_index = refresh_token.index(' refresh_token')
         refresh_token = refresh_token[token_index+1]
         
-        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        tori_url = "https://servicetori.site/html/kakaoCallBack?" + access_token
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access',access_token, httponly=True)
         response.set_cookie('refresh_token',refresh_token, httponly=True)
-        expire_in = timedelta(minutes=1)
-        response.set_cookie('social', True, max_age=expire_in.seconds)
+        
         return response
     
     except SocialAccount.DoesNotExist:
@@ -255,12 +254,11 @@ def kakao_callback(request):
         token_index = refresh_token.index(' refresh_token')
         refresh_token = refresh_token[token_index+1]
 
-        tori_url = "https://servicetori.site/html/kakaoCallBack"
+        tori_url = "https://servicetori.site/html/kakaoCallBack?" + access_token
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access',access_token, httponly=True)
         response.set_cookie('refresh_token',refresh_token, httponly=True)
-        expire_in = timedelta(minutes=1)
-        response.set_cookie('social', True, max_age=expire_in.seconds)
+
         return response
 
 class KakaoLogin(SocialLoginView):
