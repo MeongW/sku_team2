@@ -101,7 +101,10 @@ class SMSAuthConfirmView(generics.GenericAPIView):
         
         phone_number = serializer.validated_data['phone_number']
         auth_number = serializer.validated_data['auth_number']
-        auth_number = (int)auth_number
+        try:
+            auth_number = int(auth_number)
+        except:
+            auth_number = 0
         result = False
         
         auth_phone = SMSAuthentication.objects.filter(phone_number=phone_number)
