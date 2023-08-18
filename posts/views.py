@@ -60,7 +60,7 @@ class PostFilter(filters.FilterSet):
 # Post의 목록, detail 보여주기, 수정하기, 삭제하기
 class PostViewSet(viewsets.ModelViewSet):
 
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-pk')
     serializer_class = PostSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = PostFilter
@@ -70,7 +70,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.order_by('-pk')
+        
         if queryset.exists():
             serializer = GetPostSerializer(queryset, many=True)
             return Response(serializer.data)
