@@ -25,6 +25,7 @@ from rest_framework.decorators import api_view, permission_classes
 from dj_rest_auth.views import PasswordResetView
 
 import requests, logging
+from datetime import timedelta
 
 from .serializers import (
     SMSSendSerializer, 
@@ -236,6 +237,8 @@ def kakao_callback(request):
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access',access_token, httponly=True)
         response.set_cookie('refresh_token',refresh_token, httponly=True)
+        expire_in = timedelta(minutes=1)
+        response.set_cookie('social', True, max_age=expire_in.seconds)
         return response
     
     except SocialAccount.DoesNotExist:
@@ -256,6 +259,8 @@ def kakao_callback(request):
         response = HttpResponseRedirect(tori_url)
         response.set_cookie('access',access_token, httponly=True)
         response.set_cookie('refresh_token',refresh_token, httponly=True)
+        expire_in = timedelta(minutes=1)
+        response.set_cookie('social', True, max_age=expire_in.seconds)
         return response
 
 class KakaoLogin(SocialLoginView):
